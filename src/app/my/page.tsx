@@ -39,6 +39,15 @@ export const metadata: Metadata = {
 type Search = { page?: string; modal?: string; grape?: string; error?: string };
 
 /**
+ * 설정 계열 모달의 타이틀 높이 (STEP 24, 승아님 지시).
+ *
+ * Setting 은 6.1875rem, 안쪽 문서는 4.5rem 이라 오갈 때 **타이틀이 튀었다.**
+ * 문서 쪽(Open Source 에서 확인한 배치)으로 맞춰 Setting · My Account ·
+ * 문서 셋이 같은 자리에서 시작한다. 내용 시작 높이도 함께 맞춘다.
+ */
+const SETTING_TITLE_TOP = 4.5;
+
+/**
  * My Vine — Figma 201:749(빈 상태) / 201:753(판 상태) 번역.
  *
  * 배경이 상태에 따라 다르다. 판을 만들기 전은 풀밭(리빌 시작 프레임),
@@ -174,7 +183,7 @@ export default async function MyVinePage({ searchParams }: { searchParams: Promi
       ) : null}
 
       {search.modal === 'setting' ? (
-        <Modal title={copy.setting.title} label={copy.setting.title} titleTop={6.1875} closeHref={closeHref} testId="setting-modal">
+        <Modal title={copy.setting.title} label={copy.setting.title} titleTop={SETTING_TITLE_TOP} closeHref={closeHref} testId="setting-modal">
           <ul className={styles.settingList}>
             {[
               { key: 'account', label: copy.setting.myAccount },
@@ -213,7 +222,7 @@ export default async function MyVinePage({ searchParams }: { searchParams: Promi
         <Modal
           title={copy.setting.myAccount}
           label={copy.setting.myAccount}
-          titleTop={6.1875}
+          titleTop={SETTING_TITLE_TOP}
           closeHref={closeHref}
           testId="account-modal"
         >
@@ -234,7 +243,7 @@ export default async function MyVinePage({ searchParams }: { searchParams: Promi
         <Modal
           title={copy.documents[settingPage].title}
           label={copy.documents[settingPage].title}
-          titleTop={4.5}
+          titleTop={SETTING_TITLE_TOP}
           closeHref={closeHref}
           testId={`${settingPage}-modal`}
         >

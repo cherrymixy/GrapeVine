@@ -17,8 +17,8 @@
   display: flex;
   /* 201:812 top 406 — 타이틀(292 + 49) 아래 65 */
   margin-top: 4.0625rem;
-  /* 복사 결과 문구가 줄바꿈돼 아래로 가게 (STEP 23). */
-  flex-wrap: wrap;
+  /* 복사 결과 문구를 이 줄 **아래**에 띄우기 위한 기준점 (STEP 24). */
+  position: relative;
   gap: 0.5rem; /* 916 - (548 + 360) */
 }
 
@@ -38,8 +38,11 @@
 /* --- Setting (201:851~201:865) --- */
 
 .settingList {
-  /* 201:851 top 317 — 타이틀(223 + 49) 아래 45 */
-  margin: 2.8125rem 0 0;
+  /*
+   * 타이틀 아래 간격을 문서(`.document`)와 같게 맞춘다 (STEP 24).
+   * 시안은 45 였지만 그러면 Setting 과 안쪽 문서 사이에서 내용이 튄다.
+   */
+  margin: 1.5rem 0 0;
   padding: 0;
   list-style: none;
 }
@@ -72,7 +75,8 @@
 
 .account {
   width: 22.5rem;
-  margin: 2.8125rem 0 0;
+  /* 위와 같은 이유로 문서와 같은 간격 (STEP 24). */
+  margin: 1.5rem 0 0;
   font-size: var(--font-size-body);
 }
 
