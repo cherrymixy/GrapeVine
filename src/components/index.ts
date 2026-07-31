@@ -1,6 +1,7 @@
 // 공용 컴포넌트 — STEP 7 이후.
 export { CreateVineReveal } from './create-vine-reveal';
 export { DropCleanup } from './drop-cleanup';
+export { FloatingGrapes } from './floating-grapes';
 export { REVEAL_CLASS, revealStyle } from './reveal';
 export { ScrollCue } from './scroll-cue';
 export { ScrollProgress } from './scroll-progress';

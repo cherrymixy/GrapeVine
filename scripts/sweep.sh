@@ -34,9 +34,20 @@ has "리다이렉트 대상이 /login" "$(loc $B/my)" "/login"
 
 echo "── 3. 가입 검증"
 L="s$(date +%s%N | tail -c 7)"
-chk "짧은 아이디 거절" "$(loc -X POST $B/api/auth/signup -d "loginId=ab&password=test-password-123&displayName=B" | grep -o 'error=[A-Z_]*')" "error=INVALID_SIGNUP_INPUT"
-chk "짧은 비번 거절" "$(loc -X POST $B/api/auth/signup -d "loginId=${L}a&password=12345&displayName=B" | grep -o 'error=[A-Z_]*')" "error=INVALID_SIGNUP_INPUT"
-chk "빈 이름 거절" "$(loc -X POST $B/api/auth/signup -d "loginId=${L}b&password=test-password-123&displayName=" | grep -o 'error=[A-Z_]*')" "error=INVALID_SIGNUP_INPUT"
+# 어느 칸이 틀렸는지까지 알려야 한다. 하나로 뭉뚱그리면 사용자가 못 고친다.
+chk "짧은 아이디 거절" "$(loc -X POST $B/api/auth/signup -d "loginId=ab&password=test-password-123&displayName=B" | grep -o 'error=[A-Z_]*')" "error=SIGNUP_LOGIN_ID"
+chk "짧은 비번 거절" "$(loc -X POST $B/api/auth/signup -d "loginId=${L}a&password=12345&displayName=B" | grep -o 'error=[A-Z_]*')" "error=SIGNUP_PASSWORD"
+chk "빈 이름 거절" "$(loc -X POST $B/api/auth/signup -d "loginId=${L}b&password=test-password-123&displayName=" | grep -o 'error=[A-Z_]*')" "error=SIGNUP_DISPLAY_NAME"
+
+# 코드만 갈라 놓고 문구가 같으면 아무것도 나아지지 않는다. 셋이 서로 달라야 한다.
+MSG_ID=$(curl -s "$B/signup?error=SIGNUP_LOGIN_ID" | grep -oE '<p class="[^"]*error[^"]*"[^>]*>[^<]*' | sed 's/.*>//')
+MSG_PW=$(curl -s "$B/signup?error=SIGNUP_PASSWORD" | grep -oE '<p class="[^"]*error[^"]*"[^>]*>[^<]*' | sed 's/.*>//')
+MSG_NM=$(curl -s "$B/signup?error=SIGNUP_DISPLAY_NAME" | grep -oE '<p class="[^"]*error[^"]*"[^>]*>[^<]*' | sed 's/.*>//')
+if [ -n "$MSG_ID" ] && [ "$MSG_ID" != "$MSG_PW" ] && [ "$MSG_PW" != "$MSG_NM" ] && [ "$MSG_ID" != "$MSG_NM" ]; then
+  ok "가입 에러 문구가 칸마다 다름"
+else
+  bad "가입 에러 문구가 칸마다 다름" "ID='$MSG_ID' PW='$MSG_PW' NAME='$MSG_NM'"
+fi
 
 echo "── 4. 가입 → 세션"
 COOKIE=$(curl -s -D - -o /dev/null -X POST $B/api/auth/signup \

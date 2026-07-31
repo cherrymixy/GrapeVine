@@ -1,5 +1,6 @@
 import { BackLink } from '@/components/back-link';
-import { DecorGrapes, type DecorGrape } from '@/components/decor-grapes';
+import type { DecorGrape } from '@/components/decor-grapes';
+import { FloatingGrapes } from '@/components/floating-grapes';
 import { Screen } from '@/components/screen';
 import { Sidebar } from '@/components/sidebar';
 import { copy } from '@/data';
@@ -24,7 +25,11 @@ const GRAPES: readonly DecorGrape[] = [
 export default function AboutPage() {
   return (
     <Screen tone="light">
-      <DecorGrapes grapes={GRAPES} />
+      {/*
+        About 의 포도알은 떠다니고 마우스를 피한다 (승아님 지시).
+        공용 DecorGrapes 는 그대로 둔다 — 다른 세 화면까지 떠다닐 이유가 없다.
+      */}
+      <FloatingGrapes grapes={GRAPES} />
       <Sidebar variant="guest" current="/about" />
 
       <BackLink href="/" />

@@ -198,6 +198,15 @@ export const copy = {
     // --- 계정 ---
     INVALID_CREDENTIALS: 'Wrong ID or password.',
     LOGIN_ID_TAKEN: 'That ID is taken.',
+    /*
+     * ⚠️ 칸별로 갈라 놓았다. 하나로 묶어 두면 무엇을 고쳐야 할지 알 수 없다.
+     *    규칙은 `lib/auth.ts` 와 같은 값이어야 한다 — 한쪽만 바꾸면 안내와
+     *    실제 동작이 어긋난다.
+     */
+    SIGNUP_LOGIN_ID: 'ID must be 3–30 characters: letters, numbers, . _ -',
+    SIGNUP_PASSWORD: 'Password must be at least 6 characters.',
+    SIGNUP_DISPLAY_NAME: 'Enter a display name (1–40 characters).',
+    /** 칸을 못 가렸을 때만. 위 셋이 정상이면 여기 올 일이 없다. */
     INVALID_SIGNUP_INPUT: 'Check your ID, password, and name.',
     OWNER_ALREADY_HAS_VINE: 'You already have a vine.',
 

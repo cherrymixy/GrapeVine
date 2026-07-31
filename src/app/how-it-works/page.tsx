@@ -101,7 +101,7 @@ export default function HowItWorksPage() {
       {LOOSE_CIRCLES.map((circle) => (
         <span
           key={`${circle.x}-${circle.y}`}
-          className={styles.circle}
+          className={`${styles.circle} ${styles.loose}`}
           aria-hidden="true"
           style={
             {
@@ -119,7 +119,7 @@ export default function HowItWorksPage() {
         if (!step) return null;
 
         return (
-          <span key={step.no}>
+          <span key={step.no} className={styles.stepGroup}>
             <span
               className={styles.circle}
               aria-hidden="true"

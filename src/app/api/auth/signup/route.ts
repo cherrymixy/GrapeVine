@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-import { isDomainError } from '@/lib/errors';
+import { InvalidSignUpInputError, isDomainError } from '@/lib/errors';
 import { signUp } from '@/services/auth';
 
 /**
@@ -22,6 +22,27 @@ export async function POST(request: Request): Promise<Response> {
       displayName: String(form.get('displayName') ?? ''),
     });
   } catch (error) {
+    /*
+     * ⚠️ 어느 칸이 틀렸는지까지 보낸다.
+     *
+     * 전에는 코드만 넘겨서 아이디 규칙 위반이든 비번 길이든 이름 누락이든
+     * 전부 "아이디·비밀번호·이름을 확인하세요" 하나로 나왔다. 사용자는
+     * **무엇을 고쳐야 할지 알 수 없다** — 실제로 이 화면에서 막혔다.
+     * `InvalidSignUpInputError` 는 처음부터 `field` 를 들고 있었는데
+     * 여기서 버리고 있었다.
+     */
+    if (error instanceof InvalidSignUpInputError) {
+      const byField = {
+        loginId: 'SIGNUP_LOGIN_ID',
+        password: 'SIGNUP_PASSWORD',
+        displayName: 'SIGNUP_DISPLAY_NAME',
+      } as const;
+      return NextResponse.redirect(
+        new URL(`/signup?error=${byField[error.field]}`, request.url),
+        303,
+      );
+    }
+
     const code = isDomainError(error) ? error.code : 'AUTH_FAILURE';
     if (!isDomainError(error)) console.error('signup failed', error);
     return NextResponse.redirect(new URL(`/signup?error=${code}`, request.url), 303);
