@@ -15,7 +15,8 @@ export function Panel({
   testId,
   children,
 }: {
-  title: string;
+  /** 문자열 또는 마크업. Add Grape 는 두 줄에 이름만 밑줄이다(201:924). */
+  title: ReactNode;
   /** 원 위쪽에서 타이틀까지의 거리(rem). 화면마다 다르다. */
   titleTop?: number;
   /** 화면 한가운데 절대배치할지 (Login·Sign Up). 모달은 딤이 가운데를 잡는다. */

@@ -27,10 +27,20 @@
   color: var(--text-on-brand);
 }
 
-/* 201:789 / 201:898 — 밝은 바탕에 마젠타 글자 (Add Grape / Here is Full!) */
+/* 201:789 — 밝은 바탕에 마젠타 글자 (Add Grape) */
 .inverted {
   background: var(--text-sub);
   color: var(--brand);
+}
+
+/*
+ * 201:898 Here is Full! — 같은 반전이지만 글자가 훨씬 크다(46.255 vs 24).
+ * 꽉 찼다는 사실 자체가 메시지라 크기로 말한다.
+ */
+.full {
+  background: var(--text-sub);
+  color: var(--brand);
+  font-size: var(--font-size-full-cta);
 }
 
 .cta:disabled {

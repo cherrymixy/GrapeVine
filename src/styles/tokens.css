@@ -121,9 +121,12 @@
   --font-size-title: 38.316px;   /* 201:811, 201:850, 201:1006 */
   --line-height-title: normal;
 
-  /* CTA 버튼 라벨 — Add Grape / Here is Full! / Create My Vine */
-  --font-size-cta: 24px;         /* 201:790 */
+  /* CTA 버튼 라벨 — Add Grape / Create My Vine */
+  --font-size-cta: 24px;         /* 201:790, 201:752 */
   --line-height-cta: normal;
+
+  /* `Here is Full!` 만 훨씬 크다 (201:899). 꽉 찼다는 사실을 크기로 말한다. */
+  --font-size-full-cta: 46.255px;
 
   /* 사이드바 pill */
   --font-size-nav: 23px;         /* 201:648, 201:772 */

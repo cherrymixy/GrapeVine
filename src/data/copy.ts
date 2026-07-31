@@ -142,9 +142,11 @@ export const copy = {
     full: 'Here is Full!',
   },
 
-  /** Add Grape 모달 — PRD §5.10 */
+  /** Add Grape 모달 — PRD §5.10 / Figma 201:904 */
   addGrape: {
     title: (ownerName: string) => `Compliment ${ownerName}`,
+    /** 타이틀 첫 줄. 이름은 다음 줄에 밑줄로 온다 (201:924). */
+    titleLead: 'Compliment',
     /** 익명 토글 라벨 */
     anonymous: 'Unknown',
     send: 'Send',

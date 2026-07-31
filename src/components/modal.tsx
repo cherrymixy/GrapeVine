@@ -16,12 +16,15 @@ import styles from './modal.module.css';
  */
 export function Modal({
   title,
+  label,
   titleTop,
   closeHref,
   testId,
   children,
 }: {
-  title: string;
+  title: ReactNode;
+  /** 스크린리더용 이름. `title` 이 마크업일 때 필요하다. */
+  label: string;
   titleTop?: number;
   closeHref: string;
   testId: string;
@@ -31,7 +34,7 @@ export function Modal({
     <div className={styles.modal} data-testid={testId} data-modal="">
       <a className={styles.dim} href={closeHref} aria-label={copy.shell.close} />
 
-      <div className={styles.panel} role="dialog" aria-modal="true" aria-label={title}>
+      <div className={styles.panel} role="dialog" aria-modal="true" aria-label={label}>
         <Panel title={title} titleTop={titleTop}>
           {children}
         </Panel>

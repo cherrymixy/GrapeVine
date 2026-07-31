@@ -92,7 +92,7 @@ export default async function MyVinePage({ searchParams }: { searchParams: Promi
       ) : null}
 
       {search.modal === 'share' ? (
-        <Modal title={copy.share.title} titleTop={10.5} closeHref={base} testId="share-modal">
+        <Modal title={copy.share.title} label={copy.share.title} titleTop={10.5} closeHref={base} testId="share-modal">
           <div className={styles.shareRow}>
             <input className={styles.shareUrl} data-testid="share-url" readOnly value={shareUrl} />
             <CopyButton value={shareUrl} />
@@ -101,7 +101,7 @@ export default async function MyVinePage({ searchParams }: { searchParams: Promi
       ) : null}
 
       {search.modal === 'setting' ? (
-        <Modal title={copy.setting.title} titleTop={6.1875} closeHref={base} testId="setting-modal">
+        <Modal title={copy.setting.title} label={copy.setting.title} titleTop={6.1875} closeHref={base} testId="setting-modal">
           <ul className={styles.settingList}>
             <li className={styles.settingRow}>
               <a className={styles.settingLink} href={`${base}&modal=account`}>
@@ -128,6 +128,7 @@ export default async function MyVinePage({ searchParams }: { searchParams: Promi
       {openedGrape ? (
         <Modal
           title={openedGrape.isAnonymous ? copy.seeGrape.anonymousAuthor : openedGrape.authorName!}
+          label={openedGrape.isAnonymous ? copy.seeGrape.anonymousAuthor : openedGrape.authorName!}
           titleTop={6.1875}
           closeHref={base}
           testId="see-grape-modal"

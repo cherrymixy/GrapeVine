@@ -9,9 +9,34 @@ import styles from './sidebar.module.css';
  * 렌더만으로 동작하고, 링크로 바로 열 수 있으며, JS 없이도 된다.
  */
 
-export type SidebarVariant = 'guest' | 'owner';
+/**
+ * `visitor` 는 `{이름}'s Vine` 단일 항목이다 (PRD §5.0 / Figma 201:787).
+ * 남의 판에서는 갈 곳이 없으므로 링크가 아니라 표시다.
+ */
+export type SidebarVariant = 'guest' | 'owner' | 'visitor';
 
-export function Sidebar({ variant, current }: { variant: SidebarVariant; current?: string }) {
+export function Sidebar({
+  variant,
+  current,
+  ownerName,
+}: {
+  variant: SidebarVariant;
+  current?: string;
+  /** `visitor` 일 때 필요. */
+  ownerName?: string;
+}) {
+  if (variant === 'visitor') {
+    return (
+      <nav className={styles.sidebar} data-testid="sidebar" data-variant={variant}>
+        <ul className={styles.list}>
+          <li>
+            <span className={styles.pill}>{copy.othersVine.title(ownerName ?? '')}</span>
+          </li>
+        </ul>
+      </nav>
+    );
+  }
+
   const items =
     variant === 'guest'
       ? [

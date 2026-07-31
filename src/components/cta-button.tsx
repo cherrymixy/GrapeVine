@@ -17,7 +17,11 @@ export function CtaButton({
   testId,
   children,
 }: {
-  variant?: 'filled' | 'inverted';
+  /**
+   * `filled` 마젠타 바탕(Create My Vine) / `inverted` 밝은 바탕(Add Grape) /
+   * `full` 밝은 바탕에 큰 글자(Here is Full!).
+   */
+  variant?: 'filled' | 'inverted' | 'full';
   centered?: boolean;
   disabled?: boolean;
   /** 주면 링크, 없으면 submit 버튼. */
