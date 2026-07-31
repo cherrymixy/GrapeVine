@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 
 import { BackLink } from '@/components/back-link';
 import { CopyButton } from '@/components/copy-button';
+import { CreateVineReveal } from '@/components/create-vine-reveal';
 import { CtaButton } from '@/components/cta-button';
 import { GrapeBoard } from '@/components/grape-board';
 import { Modal } from '@/components/modal';
@@ -46,11 +47,23 @@ export default async function MyVinePage({ searchParams }: { searchParams: Promi
             {search.error}
           </p>
         ) : null}
-        <form method="post" action="/api/vine">
+        {/*
+          누르면 넝쿨이 스톱모션으로 드러나고, 끝나면 그때 전송된다
+          (STEP 17 / PRD §9.2). 로직은 그대로다 — 전송을 막는 게 아니라
+          미룰 뿐이고, JS 나 reduce 가 없으면 지금처럼 즉시 전송된다.
+
+          포스터는 영상의 **첫** 프레임(풀밭)이고 이 화면의 배경 스틸과
+          같은 그림이라, 영상이 나타나는 순간 이어 붙는다.
+        */}
+        <CreateVineReveal
+          action="/api/vine"
+          src="/video/myvine.mp4"
+          poster="/images/myvine_1.png"
+        >
           <CtaButton centered testId="create-vine">
             {copy.myVine.createVine}
           </CtaButton>
-        </form>
+        </CreateVineReveal>
       </Screen>
     );
   }

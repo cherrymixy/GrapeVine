@@ -1,0 +1,44 @@
+/*
+ * 판 생성 리빌 (STEP 17 / PRD §9.2).
+ *
+ * 리빌이 도는 동안만 화면을 통째로 덮는다. 그 전에는 빈 상태의 배경 스틸
+ * (같은 풀밭 그림)이 보이고 있으므로, 나타나는 순간 그림이 이어 붙는다.
+ */
+
+.reveal {
+  /*
+   * `fixed` 다. 이 영상은 폼 안에 있지만 화면 전체를 덮어야 한다 —
+   * `absolute` 로 두면 Screen 의 패딩 안쪽에만 그려진다.
+   */
+  position: fixed;
+  z-index: 1;
+  display: none;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* 배경 스틸과 같은 규칙이라야 리빌 끝과 판 화면이 어긋나지 않는다. */
+  object-fit: cover;
+}
+
+.reveal[data-revealing] {
+  display: block;
+}
+
+/*
+ * 리빌이 시작되면 버튼은 사라진다. 넝쿨 위에 버튼이 남아 있으면 아직 누를
+ * 수 있는 것처럼 보인다. `visibility` 라 자리는 그대로다 — 레이아웃이
+ * 흔들리지 않는다.
+ */
+.cta[data-revealing] {
+  visibility: hidden;
+}
+
+/*
+ * reduce — 리빌 자체가 돌지 않는다(즉시 전송). CSS 에서도 못 박아 둔다.
+ * JS 가 판단을 놓치더라도 화면이 덮이는 일은 없다.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    display: none;
+  }
+}
