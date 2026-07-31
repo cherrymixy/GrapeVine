@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 
 import { BackLink } from '@/components/back-link';
 import { CtaButton } from '@/components/cta-button';
+import { DropCleanup } from '@/components/drop-cleanup';
 import { GrapeBoard } from '@/components/grape-board';
 import { Modal } from '@/components/modal';
 import { Pagination } from '@/components/pagination';
@@ -17,7 +18,14 @@ import { resolveCtaState } from '@/services/visitor';
 
 import styles from './page.module.css';
 
-type Search = { page?: string; modal?: string; grape?: string; error?: string };
+type Search = {
+  page?: string;
+  modal?: string;
+  grape?: string;
+  error?: string;
+  /** 방금 붙은 알의 슬롯 번호. 연출 힌트다 (STEP 18) — 서버가 붙여 준다. */
+  dropped?: string;
+};
 
 /**
  * Other's Vine — Figma 201:777(빈 칸 있음) / 201:871(꽉 참) / 201:904(Add Grape).
@@ -63,7 +71,16 @@ export default async function OthersVinePage({
 
   return (
     <Screen background="/images/myvine_2.png" tone="dark" priority>
-      <GrapeBoard view={view} slotHref={(slotIndex) => `${base}&grape=${slotIndex}`} />
+      {/*
+        방금 붙은 알만 위에서 떨어진다 (PRD §9.3). 정수가 아니면 무시한다 —
+        주소는 누구나 고칠 수 있고, 이상한 값이 오면 그냥 안 떨어지면 된다.
+      */}
+      <GrapeBoard
+        view={view}
+        slotHref={(slotIndex) => `${base}&grape=${slotIndex}`}
+        dropSlot={/^\d+$/.test(search.dropped ?? '') ? Number(search.dropped) : null}
+      />
+      <DropCleanup />
 
       {/* PRD §5.0 — 방문자 GNB 는 `{이름}'s Vine` 단일 항목이다. */}
       <Sidebar variant="visitor" ownerName={owner.displayName} />

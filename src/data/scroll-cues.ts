@@ -89,6 +89,27 @@ export const MAIN_CUES = {
  *    `steps: 10` / `durationMs: 2500` = 초당 4번 바뀐다. 스톱모션으로
  *    읽히면서 판을 쓰기까지 기다리는 시간이 2.5초를 넘지 않는 선.
  */
+/**
+ * 붙이기 낙하 (PRD §9.3) — `Send` 성공 후 그 알이 위에서 톡 떨어져 붙는다.
+ *
+ * > 기획 원문: *"실제 스티커판에 한 알을 채워 넣는 감각을 그대로 옮겼다."*
+ *
+ * PRD 가 "duration/curve 는 STEP 에서 정확한 값으로 지정"하라고 남겨 둔 자리다.
+ *
+ * - `durationMs: 420` — "톡"이다. 300 이하는 무슨 일이 있었는지 못 보고,
+ *   600 을 넘으면 떨어지는 게 아니라 내려앉는다.
+ * - `fromDiameters: 3` — 알 지름의 3배 위에서 떨어진다. 자기 크기 대비라
+ *   화면이 커져도 낙하 거리의 인상이 유지된다.
+ *
+ * 곡선은 값이 아니라 모양이라 CSS 에 둔다 (`grape-board.module.css` 의
+ * `@keyframes drop`) — 떨어질 때는 가속(중력), 닿은 뒤 눌린 모양이 되돌아올
+ * 때는 감속.
+ */
+export const GRAPE_DROP = {
+  durationMs: 420,
+  fromDiameters: 3,
+} as const;
+
 export const MY_VINE_REVEAL = {
   /** 이산 단계 수. 낮을수록 뚝뚝 끊긴다. */
   steps: 10,

@@ -42,3 +42,48 @@
 a.slot {
   display: block;
 }
+
+/*
+ * 방금 붙은 알 — 위에서 톡 떨어져 붙는다 (STEP 18 / PRD §9.3).
+ * 기획 원문: "실제 스티커판에 한 알을 채워 넣는 감각을 그대로 옮겼다."
+ *
+ * 시간·거리는 `data/scroll-cues.ts` 의 `GRAPE_DROP` 이 인라인 변수로 넘긴다.
+ */
+.dropping {
+  /*
+   * 눌리는 순간 **바닥을 딛고** 납작해진다. 기본값(가운데)으로 두면 위아래로
+   * 같이 줄어들어 붙는 게 아니라 작아지는 것처럼 보인다.
+   */
+  transform-origin: 50% 100%;
+  animation: drop var(--drop-duration) both;
+}
+
+/*
+ * translate 의 % 는 **자기 자신의 크기** 기준이다. 알은 정사각(aspect-ratio
+ * 1/1)이라 `300%` 가 곧 지름 3개다 — 화면 크기와 무관하게 비율이 유지된다.
+ */
+@keyframes drop {
+  from {
+    /* 가속 = 떨어지는 느낌. 등속이면 매달려 내려오는 것처럼 보인다. */
+    animation-timing-function: cubic-bezier(0.45, 0, 0.9, 0.45);
+    transform: translate(-50%, calc(-50% - var(--drop-from))) scale(1);
+  }
+
+  /* 닿는 찰나. 스티커를 판에 눌러 붙이는 그 순간이다. */
+  70% {
+    animation-timing-function: cubic-bezier(0.2, 0.9, 0.3, 1);
+    transform: translate(-50%, -50%) scale(1.12, 0.88);
+  }
+
+  /* 제자리. `.slot` 의 기본 transform 과 정확히 같아야 끝나고 안 튄다. */
+  to {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* reduce — 떨어지지 않고 그냥 거기 있다 (PRD §9.4). */
+@media (prefers-reduced-motion: reduce) {
+  .dropping {
+    animation: none;
+  }
+}
