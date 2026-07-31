@@ -1,0 +1,91 @@
+/*
+ * Main — Figma 201:645.
+ *
+ * 헤드라인은 좌상단 정렬(§11 중앙 정렬 지양). 포도알 3개는 사진 위에
+ * 흩어져 있고, 위치는 프레임(1536×771) 대비 % 라 뷰포트가 바뀌어도
+ * 넝쿨과의 관계가 유지된다.
+ */
+
+.title {
+  margin: 0;
+  font-size: var(--font-size-display);
+  font-weight: var(--font-weight);
+  line-height: var(--line-height-display);
+  letter-spacing: var(--letter-spacing);
+  white-space: nowrap;
+}
+
+/*
+ * "vine" 에 걸린 텍스트 선택 하이라이트 (201:653 + 캐럿 201:656 / 201:657).
+ * 좌표로 박지 않고 글자를 감싼다 — 폰트가 실제로 그려진 자리에 붙어야
+ * 뷰포트나 폰트 로딩 상태가 달라져도 어긋나지 않는다.
+ */
+.selected {
+  position: relative;
+  padding-inline: 0.209rem; /* 201:653 폭 121 - "vine" 자체 폭 */
+  background: var(--selection);
+}
+
+.selected::before,
+.selected::after {
+  position: absolute;
+  top: -0.5rem;
+  bottom: -0.5rem;
+  width: var(--selection-caret-width);
+  background: var(--selection-caret);
+  content: '';
+}
+
+.selected::before {
+  left: calc(var(--selection-caret-width) * -1);
+}
+
+.selected::after {
+  right: calc(var(--selection-caret-width) * -1);
+}
+
+/* 캐럿 양 끝의 점 — 위쪽 왼편, 아래쪽 오른편 (스샷 기준) */
+.caretDots::before,
+.caretDots::after {
+  position: absolute;
+  width: var(--selection-caret-dot);
+  height: var(--selection-caret-dot);
+  border-radius: var(--radius-pill);
+  background: var(--selection-caret);
+  content: '';
+}
+
+.caretDots::before {
+  top: calc(-0.5rem - var(--selection-caret-dot) / 2);
+  left: calc(var(--selection-caret-dot) / -2);
+}
+
+.caretDots::after {
+  right: calc(var(--selection-caret-dot) / -2);
+  bottom: calc(-0.5rem - var(--selection-caret-dot) / 2);
+}
+
+.subtitle {
+  /*
+   * Figma 는 문장 단위로 두 줄이다(201:655). 폭(680)만 주고 자연 줄바꿈에
+   * 맡겼더니 브라우저 글자 폭이 미세하게 넓어 한 낱말 일찍 끊겼다.
+   * 문장으로 끊어 렌더해 폰트 렌더링 차이에 흔들리지 않게 한다.
+   */
+  margin: 0.875rem 0 0; /* 201:655 top 110.5 - (35.5 + 61) */
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+}
+
+.subtitleLine {
+  display: block;
+}
+
+/* 사진 위에 흩어진 장식 포도알 — 판의 슬롯이 아니다(slot-layout 소관 아님). */
+.grape {
+  position: absolute;
+  width: 10.612%; /* 163 / 1536 */
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-pill);
+  background: var(--grape-filled);
+  transform: translate(-50%, -50%);
+}

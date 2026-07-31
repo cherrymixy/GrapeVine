@@ -53,8 +53,13 @@
    * 세로 캐럿(201:656 / 201:657)은 벡터가 export 돼 있어 STEP 11 에셋 소관.
    */
   --selection: rgba(0, 97, 243, 0.2);   /* 201:653 Rectangle 25 */
-  --selection-width: 121px;             /* 201:653 */
-  --selection-height: 50px;             /* 201:653 */
+  /* 캐럿 선·점. 하이라이트와 같은 파랑의 불투명 버전이다. */
+  --selection-caret: rgb(0, 97, 243);
+  --selection-caret-width: 2px;         /* 201:656 획 두께 */
+  --selection-caret-dot: 8px;           /* 201:656 inset -5.33px → 지름 ≈ 10.7 - 획 */
+
+  /* 현재 화면을 가리키는 pill (201:771 opacity 30%) */
+  --pill-current-opacity: 0.3;
 
   /* 보더 (pill·입력 필드). 화면 계열에 따라 --text / --text-on-board 를 쓴다. */
   --border-width: 2px;           /* 201:647 pill: border-2 */

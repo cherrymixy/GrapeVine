@@ -1,0 +1,40 @@
+/*
+ * 화면 셸 — 모든 프레임이 공유하는 구조 (Figma 1536×771 기준).
+ *
+ * 고정폭을 쓰지 않는다. 프레임은 아트보드일 뿐이고, 실제로는 뷰포트 전체를
+ * 채우는 사진 위에 UI 가 얹힌다. 여백은 rem(px 1:1), 사진 위 요소의 위치는
+ * % 로 잡아 비율이 유지되게 한다.
+ */
+
+.screen {
+  position: relative;
+  min-height: 100dvh;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* 배경 사진 — 뷰포트를 덮는다. Figma 는 프레임보다 큰 이미지를 넘치게 얹는다. */
+.background {
+  object-fit: cover;
+  z-index: -1;
+}
+
+/*
+ * 화면 계열에 따라 대비 색이 갈린다.
+ * light  = 밝은 사진(Main·About·How It Works·Login·모달) → 검정
+ * dark   = 어두운 사진(My Vine·Other's Vine)             → 흰색
+ */
+.screen[data-tone='light'] {
+  --screen-ink: var(--text);
+}
+
+.screen[data-tone='dark'] {
+  --screen-ink: var(--text-on-board);
+}
+
+.content {
+  position: relative;
+  min-height: 100dvh;
+  padding: var(--page-padding-top) var(--page-padding-right) 0 var(--page-padding-left);
+  color: var(--screen-ink);
+}

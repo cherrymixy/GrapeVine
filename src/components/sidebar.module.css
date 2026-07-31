@@ -1,0 +1,53 @@
+/*
+ * 우상단 세로 스택 사이드바 (Figma 201:647~201:652 / 201:771~201:776).
+ *
+ * pill 은 오른쪽 끝을 맞춰 쌓인다 — Figma 에서 "How It Works"(폭 196)만
+ * 왼쪽으로 더 나와 있고 우측 x 는 셋 다 1501 로 같다.
+ * 색은 --screen-ink 를 따라간다(Screen 이 tone 으로 정한다).
+ */
+
+.sidebar {
+  position: absolute;
+  top: var(--sidebar-top);
+  right: var(--page-padding-right);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--sidebar-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  /*
+   * Figma 프레임 높이를 그대로 쓴다(201:647 = 35).
+   * `min-height` + `line-height: normal` 로 두면 23px 글자의 줄상자(≈29)에
+   * 패딩·보더가 더해져 39px 가 되고, pill 이 하나씩 아래로 밀린다.
+   * 높이를 고정하고 flex 로 가운데 맞추면 세로 패딩과 무관하게 35 가 나온다.
+   */
+  height: var(--pill-height);
+  padding-inline: var(--pill-padding-x);
+  border: var(--border-width) solid currentColor;
+  border-radius: var(--radius-pill);
+  color: inherit;
+  font-size: var(--font-size-nav);
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/*
+ * 현재 보고 있는 화면의 pill (Figma 201:771 은 opacity 30%).
+ * 눌러도 같은 자리라 링크 자체를 죽이지는 않고 흐리게만 둔다.
+ */
+.pill[aria-current='page'] {
+  opacity: var(--pill-current-opacity);
+}
