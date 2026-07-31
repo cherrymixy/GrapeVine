@@ -30,25 +30,31 @@ const CLIENT_OPTIONS = {
 } as const;
 
 /**
- * RLS를 우회하는 특권 클라이언트. RPC 호출과 쓰기에 사용한다.
+ * 환경변수 이름은 Supabase 대시보드의 현재 라벨(Publishable / Secret)을 따른다.
+ * 구버전 라벨과의 대응: publishable = anon, secret = service_role.
+ * 함수 이름은 Postgres 역할 기준이다 — RLS 를 따질 때 중요한 건 키가 아니라 역할이라서.
+ */
+
+/**
+ * service_role 로 붙는 특권 클라이언트. RLS 를 우회한다. RPC 호출과 쓰기에 사용.
  * 요청마다 새로 만든다 — 서버리스에서 인스턴스를 공유하면 상태가 섞인다.
  */
 export function createServiceRoleClient(): SupabaseClient {
   return createClient(
     requireEnv('SUPABASE_URL'),
-    requireEnv('SUPABASE_SERVICE_ROLE_KEY'),
+    requireEnv('SUPABASE_SECRET_KEY'),
     CLIENT_OPTIONS,
   );
 }
 
 /**
- * anon 키 클라이언트. 인증 호출(STEP 4)에 사용한다.
+ * anon 역할로 붙는 클라이언트. 인증 호출(STEP 4)에 사용한다.
  * 브라우저로 내려보내지 않는다 — 서버에서만 호출한다.
  */
 export function createAnonClient(): SupabaseClient {
   return createClient(
     requireEnv('SUPABASE_URL'),
-    requireEnv('SUPABASE_ANON_KEY'),
+    requireEnv('SUPABASE_PUBLISHABLE_KEY'),
     CLIENT_OPTIONS,
   );
 }
