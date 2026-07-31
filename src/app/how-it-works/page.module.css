@@ -43,16 +43,20 @@
 
 .label {
   /*
-   * Figma 는 문구를 손으로 끊어 놨지만(예: "Create " / "My Grapevine")
-   * data/steps.ts 는 한 줄짜리 문자열이고 이번 범위가 아니다.
-   * 원문 폭을 주고 자연 줄바꿈에 맡긴다.
+   * 줄은 data/steps.ts 가 끊어 놓은 대로 그린다(Figma 조판 그대로).
+   * 폭을 주고 자연 줄바꿈에 맡기면 첫 줄이 길어지고, 오른쪽 정렬이라
+   * 왼쪽으로 밀려 번호 뱃지를 덮는다.
    */
-  width: var(--label-width);
   color: var(--label-ink);
   font-size: var(--label-size);
   line-height: var(--line-height-title);
   text-align: right;
+  white-space: nowrap;
   transform: translate(-50%, -50%) rotate(var(--rotate));
+}
+
+.labelLine {
+  display: block;
 }
 
 .decoration {

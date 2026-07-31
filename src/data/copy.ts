@@ -10,10 +10,44 @@
  * How It Works 01~05 는 PRD §6 상 data/steps.ts 소관이라 여기 없다.
  */
 
+/**
+ * 브랜딩용 태그라인 (PRD §1). 문장이라 마침표가 붙는다.
+ * 화면 헤드라인은 마침표가 없다 — 아래 `HEADLINE` 참조.
+ */
 const TAGLINE = 'Grapes are growing on the vine.';
+
+/**
+ * Main·About 헤드라인 (Figma 201:654 / 201:681).
+ *
+ * 태그라인과 달리 **마침표가 없다.** PRD §1 의 태그라인에는 있지만
+ * 비주얼 SSOT 인 Figma 의 헤드라인 노드에는 없다(PRD §12).
+ * 문장이 아니라 표제로 쓰이기 때문이다.
+ */
+const HEADLINE = 'Grapes are growing on the vine';
+
+/**
+ * Figma 가 손으로 끊어 놓은 줄들.
+ *
+ * 폭만 주고 자연 줄바꿈에 맡기면 브라우저 글자 폭이 미세하게 달라 다른
+ * 지점에서 끊긴다. 시안의 조판이 곧 디자인이므로 끊는 위치를 여기 둔다.
+ * 한 줄짜리 문장이 필요한 곳(메타데이터 등)은 `join(' ')` 로 합쳐 쓴다.
+ */
+const MAIN_SUBTITLE_LINES = [
+  'The compliments friends leave on my grapevine grow into grapes.',
+  'Leave compliments that were hard to say face-to-face.',
+] as const;
+
+/** Figma 201:679 — 네 줄. 셋째 줄은 문장 중간에서 끊긴다. */
+const ABOUT_BODY_LINES = [
+  'This is a compliment board to share with friends.',
+  'Create your tree and share the link with your friends.',
+  'Friends can add compliments to your board',
+  'and help your grapes grow without logging in.',
+] as const;
 
 export const copy = {
   tagline: TAGLINE,
+  headline: HEADLINE,
 
   /** 공통 셸 — 우상단 세로 사이드바 (PRD §5.0) */
   nav: {
@@ -25,24 +59,29 @@ export const copy = {
     setting: 'Setting',
   },
 
-  /** Main `/` — PRD §5.1 */
+  /** Main `/` — PRD §5.1 / Figma 201:645 */
   main: {
-    title: TAGLINE,
-    subtitle:
-      'The compliments friends leave on my grapevine grow into grapes. Leave compliments that were hard to say face-to-face.',
+    title: HEADLINE,
+    subtitleLines: MAIN_SUBTITLE_LINES,
+    subtitle: MAIN_SUBTITLE_LINES.join(' '),
   },
 
-  /** About `/about` — PRD §5.2 */
+  /** About `/about` — PRD §5.2 / Figma 201:667 */
   about: {
-    // TODO(승아): PRD 는 "타이틀 + 설명 문단"이라고만 하고 타이틀 문구를 주지
-    // 않았다. 회색박스용으로 사이드바 라벨을 그대로 쓴다. 피그마 확정 시 교체.
-    title: 'About',
-    body: 'This is a compliment board to share with friends. Create your tree and share the link with your friends. Friends can add compliments to your board and help your grapes grow without logging in.',
+    /** 헤드라인은 "About" 이 아니라 태그라인이다 (201:681). */
+    title: HEADLINE,
+    bodyLines: ABOUT_BODY_LINES,
+    body: ABOUT_BODY_LINES.join(' '),
+    /** 헤드라인 오른쪽에 작게 붙는 장식 문구 (201:680). */
+    note: 'is...',
   },
 
   /** How It Works `/how-it-works` — PRD §5.3. 단계 텍스트는 data/steps.ts. */
   howItWorks: {
-    // TODO(승아): 타이틀 문구 미지정. 사이드바 라벨을 임시로 쓴다.
+    /**
+     * Figma 201:682 에는 화면 타이틀이 없다 — 뒤로가기와 단계 원만 있다.
+     * 사이드바 라벨용으로만 남겨 둔다.
+     */
     title: 'How It Works',
   },
 

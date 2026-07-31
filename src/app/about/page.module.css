@@ -15,15 +15,24 @@
   white-space: nowrap;
 }
 
+/*
+ * 헤드라인 오른쪽의 작은 장식 문구 (201:680).
+ * 헤드라인 오른쪽 끝(x 900)에서 31 떨어져 있고 글자는 본문 크기다.
+ */
+.note {
+  margin-left: 1.9375rem; /* 931 - 900 */
+  font-size: var(--font-size-body);
+  vertical-align: baseline;
+}
+
 .body {
-  /*
-   * Figma 는 네 줄로 끊어 놨지만(201:679) copy.ts 는 한 문장이고 data/ 는
-   * 이번 범위가 아니다. 원문 폭(583)을 주고 자연 줄바꿈에 맡긴다 —
-   * 끊기는 지점이 시안과 완전히 같지는 않다.
-   */
-  max-width: 36.4375rem; /* 201:679 width 583 */
   /* 201:679 top 326 — 헤드라인(232 + 61) 아래 33 */
   margin: 2.0625rem 0 0;
   font-size: var(--font-size-body);
   line-height: var(--line-height-body);
+}
+
+/* Figma 가 손으로 끊어 놓은 줄 그대로 (copy.about.bodyLines). */
+.bodyLine {
+  display: block;
 }

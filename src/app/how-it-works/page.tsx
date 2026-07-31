@@ -14,9 +14,9 @@ import styles from './page.module.css';
  * - 문구와 번호: `data/steps.ts` (절대규칙 6)
  * - 좌표·지름·각도·크기: 아래 표 (순수 비주얼 값)
  *
- * ⚠️ PRD §6 은 "원 크기 스케일 값"도 `data/steps.ts` 소관이라고 한다.
- *    지금 그 파일의 `scale` 은 전부 1(TODO)이고 data/ 는 이번 범위가 아니라
- *    실제 크기를 여기에 뒀다. data/ 수정이 열리면 옮겨야 한다.
+ * PRD §6 은 "원 크기 스케일 값"도 steps.ts 소관이라고 했지만, 실측 결과 원과
+ * 글자가 서로 다른 비율로 줄어들어 스칼라 하나로 표현되지 않는다. 크기·좌표·
+ * 각도를 여기 한 표에 모아 둔다 — 흩어 놓는 것보다 고치기 쉽다.
  *
  * 좌표는 전부 프레임(1536×771) 대비 중심 % 다.
  */
@@ -26,8 +26,8 @@ type StepVisual = {
   circle: { x: number; y: number; size: number; fill: 'brand' | 'deep' };
   /** 번호 뱃지 — 중심 %, 글자 크기 rem */
   badge: { x: number; y: number; size: number; padding: number };
-  /** 문구 — 중심 %, 폭 %, 글자 크기 rem */
-  label: { x: number; y: number; width: number; size: number };
+  /** 문구 — 중심 %, 글자 크기 rem. 줄바꿈은 steps.ts 가 정한다. */
+  label: { x: number; y: number; size: number };
   /** 단계 전체 기울기 */
   rotate: number;
   /** 원 위에서 읽히는 글자색 */
@@ -40,7 +40,7 @@ const STEP_VISUALS: readonly StepVisual[] = [
     // 01 — 201:690 (485) / 201:699 / 201:701
     circle: { x: 14.03, y: 54.799, size: 31.576, fill: 'brand' },
     badge: { x: 8.285, y: 42.213, size: 1.984, padding: 0.417 },
-    label: { x: 14.026, y: 54.89, width: 23.058, size: 2.976 },
+    label: { x: 14.026, y: 54.89, size: 2.976 },
     rotate: 32.96,
     ink: 'dark',
   },
@@ -48,7 +48,7 @@ const STEP_VISUALS: readonly StepVisual[] = [
     // 02 — 201:691 (275) / 201:702 / 201:704
     circle: { x: 36.816, y: 35.603, size: 17.904, fill: 'deep' },
     badge: { x: 30.532, y: 37.108, size: 0.959, padding: 0.201 },
-    label: { x: 36.816, y: 35.667, width: 15.75, size: 1.438 },
+    label: { x: 36.816, y: 35.667, size: 1.438 },
     rotate: -15.75,
     ink: 'light',
   },
@@ -56,7 +56,7 @@ const STEP_VISUALS: readonly StepVisual[] = [
     // 03 — 201:693 (367) / 201:707 / 201:709
     circle: { x: 55.306, y: 54.799, size: 23.893, fill: 'brand' },
     badge: { x: 49.486, y: 45.577, size: 1.597, padding: 0.335 },
-    label: { x: 55.338, y: 54.799, width: 19.522, size: 2.395 },
+    label: { x: 55.338, y: 54.799, size: 2.395 },
     rotate: 11.56,
     ink: 'dark',
   },
@@ -64,7 +64,7 @@ const STEP_VISUALS: readonly StepVisual[] = [
     // 04 — 201:698 (197) / 201:710 / 201:712
     circle: { x: 78.874, y: 55.577, size: 12.826, fill: 'deep' },
     badge: { x: 74.625, y: 56.953, size: 0.648, padding: 0.136 },
-    label: { x: 78.884, y: 55.677, width: 10.64, size: 0.972 },
+    label: { x: 78.884, y: 55.677, size: 0.972 },
     rotate: -18.67,
     ink: 'light',
   },
@@ -72,7 +72,7 @@ const STEP_VISUALS: readonly StepVisual[] = [
     // 05 — 201:692 (275) / 201:713 / 201:715
     circle: { x: 90.462, y: 75.681, size: 17.904, fill: 'brand' },
     badge: { x: 86.059, y: 70.406, size: 1.203, padding: 0.253 },
-    label: { x: 90.495, y: 75.746, width: 14.351, size: 1.805 },
+    label: { x: 90.495, y: 75.746, size: 1.805 },
     rotate: 16.43,
     ink: 'dark',
   },
@@ -155,13 +155,16 @@ export default function HowItWorksPage() {
                   '--x': `${visual.label.x}%`,
                   '--y': `${visual.label.y}%`,
                   '--rotate': `${visual.rotate}deg`,
-                  '--label-width': `${visual.label.width}%`,
                   '--label-size': `${visual.label.size}rem`,
                   '--label-ink': INK[visual.ink],
                 } as CSSProperties
               }
             >
-              {step.text}
+              {step.lines.map((line) => (
+                <span key={line} className={styles.labelLine}>
+                  {line}
+                </span>
+              ))}
             </span>
           </span>
         );

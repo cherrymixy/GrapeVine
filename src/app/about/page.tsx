@@ -10,7 +10,7 @@ import styles from './page.module.css';
  * About — Figma 201:667 번역.
  *
  * 헤드라인은 About 이라는 낱말이 아니라 **태그라인**이다(201:681).
- * `copy.about.title` 은 STEP 7 에서 임시로 넣은 자리표시자라 쓰지 않는다.
+ * 그 오른쪽에 작은 장식 문구 `is...`(201:680)가 붙는다.
  */
 
 /** 프레임(1536×771) 대비 %. Figma 201:671 / 670 / 669 / 668. */
@@ -29,8 +29,18 @@ export default function AboutPage() {
 
       <BackLink href="/" />
 
-      <h1 className={styles.title}>{copy.main.title}</h1>
-      <p className={styles.body}>{copy.about.body}</p>
+      <h1 className={styles.title}>
+        {copy.about.title}
+        <span className={styles.note}>{copy.about.note}</span>
+      </h1>
+
+      <p className={styles.body}>
+        {copy.about.bodyLines.map((line) => (
+          <span key={line} className={styles.bodyLine}>
+            {line}
+          </span>
+        ))}
+      </p>
     </Screen>
   );
 }
