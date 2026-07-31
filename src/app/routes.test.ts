@@ -109,7 +109,9 @@ describe.skipIf(!hasCredentials)('라우트 (실서버)', () => {
     const myResponse = await fetch(`${BASE}/my`, { redirect: 'manual', headers: { cookie } });
 
     expect(myResponse.status).toBe(200);
-    await expect(myResponse.text()).resolves.toContain('Blair');
+    // 로그인 상태에서만 나오는 사이드바 변형이 세션이 살아 있다는 증거다.
+    // (빈 상태 화면에는 displayName 이 없다 — PRD §5.5 는 버튼 하나만 둔다.)
+    await expect(myResponse.text()).resolves.toContain('data-variant="owner"');
   });
 
   it('/v/[slug] 는 세션과 무관하게 항상 공개다', async () => {
@@ -149,8 +151,11 @@ describe.skipIf(!hasCredentials)('라우트 (실서버)', () => {
       });
       expect(created.status).toBe(303);
 
-      // 2) /my 에 공유 URL 이 뜬다
-      const my = await fetch(`${BASE}/my`, { redirect: 'manual', headers: { cookie: ownerCookie } });
+      // 2) Share My Vine 모달에 공유 URL 이 뜬다
+      const my = await fetch(`${BASE}/my?modal=share`, {
+        redirect: 'manual',
+        headers: { cookie: ownerCookie },
+      });
       const myHtml = await my.text();
       const shareUrl = /data-testid="share-url"[^>]*value="([^"]+)"/.exec(myHtml)?.[1];
       expect(shareUrl).toMatch(/\/v\/[a-z0-9]{10}$/);
@@ -220,7 +225,7 @@ describe.skipIf(!hasCredentials)('라우트 (실서버)', () => {
         const response = await fetch(`${BASE}/v/${vine.slug}${query}`, { redirect: 'manual' });
         expect(response.status).toBe(200);
         const html = await response.text();
-        const tag = /<p[^>]*data-testid="pagination"[^>]*>/.exec(html)?.[0] ?? '';
+        const tag = /<[a-z]+[^>]*data-testid="pagination"[^>]*>/.exec(html)?.[0] ?? '';
         return [
           /data-page="(\d+)"/.exec(tag)?.[1],
           /data-total="(\d+)"/.exec(tag)?.[1],
