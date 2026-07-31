@@ -1,2 +1,2 @@
-// slot-layout.ts / copy.ts / steps.ts / scroll-cues.ts — STEP 2 이후.
-export {};
+export { copy } from './copy';
+export { PAGE_CAPACITY, SLOT_LAYOUT, type SlotLayout } from './slot-layout';

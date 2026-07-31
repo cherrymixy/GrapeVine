@@ -26,3 +26,19 @@
 - **`styles/globals.css` 를 빈 플레이스홀더로 둠** — 리셋·색조차 넣지 않는다. 작업규칙 8·9상 STEP 1은 디자인 값을 정할 자리가 아니다. STEP 10에서 토큰과 함께 채운다.
 - **`turbopack.root` 명시** — 홈 디렉터리의 무관한 `package-lock.json` 때문에 Next가 워크스페이스 루트를 잘못 추론한다.
 - ⚠️ **한시적 규칙 예외:** 라우트 7개에 `"GRAPEVINE"` 문자열을 직접 박았다. 절대규칙 6(문구는 `data/copy.ts`)의 예외다. 이건 제품 카피가 아니라 "이 라우트가 살아 있다"는 스캐폴드 마커이고, `data/copy.ts` 는 아직 존재하지 않는다. **STEP 7(회색박스)에서 실제 카피로 전량 교체하며 그때 이 마커는 0개가 되어야 한다.**
+
+## STEP 2 — 모델·스키마·슬롯좌표
+
+- **`models/` 는 단일 파일** — "import 금지"를 문자 그대로 지키려면 `PageView` 가 `Grape` 를 참조하는 순간 파일을 나눌 수 없다. 5개 타입을 `models/index.ts` 하나에 둬서 import 문이 0개다.
+- **`PageSlot` 타입을 이름 붙여 분리** — PRD §8 은 `slots: Array<{ slotIndex; grape }>` 인라인이지만, repositories/components 양쪽이 이 모양을 참조하므로 이름이 필요하다. 구조는 PRD 그대로.
+- **제약에 전부 명시적 이름을 붙임** — `repositories/` 어댑터가 제약 이름으로 도메인 에러를 판별한다. Postgres 자동 생성 이름에 의존하면 이름이 바뀔 때 에러 매핑이 조용히 깨진다. 로컬 PG16 으로 실측한 값: 슬롯 충돌 → **SQLSTATE `23505` / `grapes_slot_key`**, 80자 초과 → **`23514` / `grapes_message_length_check`**.
+- **`UNIQUE(vine_id, page_index)` 추가** — 요청 목록에 없었지만 PRD §7-3 페이지 자동 증설의 정확성이 여기 걸린다. 마지막 두 칸이 동시에 채워지면 "다음 페이지 생성" 판정도 함께 경쟁하므로, 이 제약이 없으면 같은 page_index 가 두 번 생길 수 있다.
+- **`UNIQUE(vines.owner_id)` 추가** — PRD §7-1 "판은 사용자당 1개"를 스키마로 강제. Create 버튼 더블클릭도 이걸로 막힌다.
+- **전 테이블 RLS enable, 정책 0개** — anon/authenticated deny-all. service_role 만 통과하므로 "모든 접근은 서버 경유" 설계가 DB 레벨에서 강제된다.
+- **`users` 를 `auth.users` 와 아직 연결하지 않음** — PRD §8 그대로 독립 테이블. FK(`id references auth.users(id)`)는 STEP 4(계정)에서 추가한다.
+- **`slot_index` 상한은 스키마로 강제하지 않음** — 상한이 `vine_pages.capacity` 라 테이블 CHECK 로 표현할 수 없다. STEP 5 의 `attach_grape` RPC 가 대조한다. 하한(`>= 0`)만 CHECK.
+- **`vine_pages` 에 `created_at` 없음** — PRD §8 `VinePage` 에 없다. 순서는 `page_index` 로 정해지므로 필요도 없다. 모델과 DB를 어긋나게 두지 않는다.
+- **`message` 하한 미설정** — 요청 스펙이 `char_length(message) <= 80` 이라 그대로 따랐다. 빈 문자열이 통과하므로 **STEP 5 서비스 검증에서 막아야 한다.**
+- **`copy.ts` 는 PRD 에 문자 그대로 있는 문구만 채움** — About 타이틀·에러·빈 상태는 PRD 에 문안이 없어 지어내지 않고 TODO. 작업규칙 8.
+- **`slot-layout.ts` 좌표계 규약 확정** — xPct/yPct 는 알의 **중심**, sizePct 는 **지름이며 컨테이너 폭 대비**. 지름을 높이 대비로 잡으면 종횡비가 바뀔 때 알이 타원이 된다. 값 수령 시 이 규약을 함께 확인할 것.
+- **좌표 미수령 상태를 `it.todo` 로 표시** — 배열이 비어 구조 검사가 공허하게 통과하므로, 개수 검사만 todo 로 남겨 "아직 안 끝났다"를 테스트 결과에 드러낸다.
