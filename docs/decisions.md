@@ -858,7 +858,7 @@ test 116 / typecheck / build / 기능 스윕 57 / 모바일 시퀀스 9/9 / hex 
 
 ## v1.0 — 배포
 
-- **라이브:** https://grapevine-vine.vercel.app
+- **라이브:** https://grapevine-kr.vercel.app
 - **저장소:** https://github.com/cherrymixy/GrapeVine (설명·토픽·홈페이지 설정 완료)
 - 태그: `v0.1-logic` → `v0.2-visual` → `v0.3-motion` → `v1.0`
 
@@ -869,6 +869,8 @@ test 116 / typecheck / build / 기능 스윕 57 / 모바일 시퀀스 9/9 / hex 
 **2. `SITE_URL` 은 빌드 시점에 박힌다.** `/` 가 정적 프리렌더라 배포 *뒤에* 환경변수를 넣으면 반영되지 않는다 — OG 이미지가 배포별 URL(`grapevine-fl4u24jth-…`)을 가리켰다. `layout.tsx` 에 적어 둔 함정을 그대로 밟았다. 환경변수를 넣고 **다시 빌드**해서 잡았다.
 
 **3. 수동 별칭은 새 배포로 따라오지 않는다.** `vercel alias set` 은 그 배포 하나에 붙는다. git push 로 새 배포가 떠도 별칭은 옛 배포를 가리켰다. **프로젝트 도메인으로 등록**해야 프로덕션에 자동으로 붙는다.
+
+**4. 검증하느라 두드린 주소가 봇 보호에 걸렸다.** 처음 잡은 `grapevine-vine.vercel.app` 에 스모크 테스트·스크린샷·이미지 워밍으로 수십 번 요청을 보냈더니 그 호스트네임만 **Vercel Security Checkpoint** 로 막혔다 — 실제 브라우저로도 뚫리지 않았다. 다른 주소(`grapevine-kr`, 자동 별칭)는 멀쩡했으므로 호스트네임 단위 조치다. 새 주소로 옮기고, 이후 검증은 curl 대신 브라우저로 최소한만 했다.
 
 ### 스크린샷을 찍으며 배운 것
 

@@ -9,7 +9,7 @@
 친구가 남긴 칭찬이 내 넝쿨에서 포도알로 자란다.
 얼굴 보고 하기 어려웠던 말을, 링크 하나로.
 
-**[→ 열어보기](https://grapevine-vine.vercel.app)** · **[→ 데모 판에 칭찬 남기기](https://grapevine-vine.vercel.app/v/nht8x5qwdj)**
+**[→ 열어보기](https://grapevine-kr.vercel.app)** · **[→ 데모 판에 칭찬 남기기](https://grapevine-kr.vercel.app/v/nht8x5qwdj)**
 
 <sub>데모 판은 로그인 없이 바로 한 알 붙일 수 있다.</sub>
 
