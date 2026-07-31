@@ -150,6 +150,11 @@ export const IMAGE_SEQUENCE = {
      */
     coarseStride: 8,
   },
+  /**
+   * 리빌은 **모든 기기**가 이걸 쓴다 (STEP 20). 영상은 지웠다.
+   * 이산 10단계라 그림이 11장뿐이라, 1440폭 원본 화질로 둬도 0.84MB 다 —
+   * 7.8MB 영상을 받아 그중 11장만 보여 주던 것보다 9배 작다.
+   */
   reveal: {
     dir: '/images/reveal-seq',
     /** `MY_VINE_REVEAL.steps` + 1. 계단 하나당 한 장. */

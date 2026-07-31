@@ -52,14 +52,11 @@ export default async function MyVinePage({ searchParams }: { searchParams: Promi
           (STEP 17 / PRD §9.2). 로직은 그대로다 — 전송을 막는 게 아니라
           미룰 뿐이고, JS 나 reduce 가 없으면 지금처럼 즉시 전송된다.
 
-          포스터는 영상의 **첫** 프레임(풀밭)이고 이 화면의 배경 스틸과
-          같은 그림이라, 영상이 나타나는 순간 이어 붙는다.
+          그림은 `images/reveal-seq` 11장이다 (STEP 20). 첫 장이 이 화면의
+          배경 스틸(풀밭)과 같고 마지막 장이 판 화면 배경(넝쿨)과 같아서
+          시작도 끝도 이어 붙는다.
         */}
-        <CreateVineReveal
-          action="/api/vine"
-          src="/video/myvine.mp4"
-          poster="/images/myvine_1.png"
-        >
+        <CreateVineReveal action="/api/vine">
           <CtaButton centered testId="create-vine">
             {copy.myVine.createVine}
           </CtaButton>
