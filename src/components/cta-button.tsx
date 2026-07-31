@@ -14,6 +14,7 @@ export function CtaButton({
   centered = false,
   disabled = false,
   href,
+  onClick,
   testId,
   children,
 }: {
@@ -26,6 +27,12 @@ export function CtaButton({
   disabled?: boolean;
   /** 주면 링크, 없으면 submit 버튼. */
   href?: string;
+  /**
+   * 누를 때 할 일. **클라이언트 컴포넌트에서만** 넘길 수 있다 —
+   * 서버 컴포넌트가 함수를 넘기면 빌드가 막는다(그게 맞다).
+   * 오류 화면의 "다시 시도"가 이걸 쓴다 (STEP 20).
+   */
+  onClick?: () => void;
   testId?: string;
   children: ReactNode;
 }) {
@@ -44,8 +51,9 @@ export function CtaButton({
   return (
     <button
       className={className}
-      type={href ? 'button' : 'submit'}
+      type={href || onClick ? 'button' : 'submit'}
       disabled={disabled}
+      onClick={onClick}
       data-testid={testId}
       data-kind={variant}
     >

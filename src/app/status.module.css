@@ -1,0 +1,35 @@
+/*
+ * 404 · 오류 화면 (STEP 20).
+ *
+ * ⚠️ Figma 에 이 두 화면의 시안이 없다. 새 규칙을 지어내지 않고 이미 있는
+ *    것만 쓴다 — 헤드라인은 display 크기, 본문은 body, 버튼은 이 서비스의
+ *    CTA 그대로. 색은 전부 토큰이다.
+ *
+ * §11 이 중앙 정렬을 지양하라고 했지만 여기는 **화면에 이것밖에 없는**
+ * 경우다. 좌상단에 붙여 두면 넓은 빈 화면에 문장 하나가 떠 있게 된다.
+ */
+
+.center {
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--status-gap);
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--font-size-display);
+  font-weight: var(--font-weight);
+  line-height: var(--line-height-display);
+  letter-spacing: var(--letter-spacing);
+}
+
+.body {
+  max-width: 34rem;
+  margin: 0;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+}

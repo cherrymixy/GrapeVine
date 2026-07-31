@@ -1,11 +1,28 @@
+import type { Metadata } from 'next';
 import { BackLink } from '@/components/back-link';
 import { DecorGrapes, type DecorGrape } from '@/components/decor-grapes';
 import { Panel } from '@/components/panel';
 import { Screen } from '@/components/screen';
 import { Sidebar } from '@/components/sidebar';
 import { copy } from '@/data';
+import { errorMessage } from '@/lib/error-message';
 
 import styles from '@/components/auth-form.module.css';
+
+/*
+ * 색인하지 말 것 (STEP 20).
+ *
+ * `robots.txt` 는 크롤러에게 **오지 말라**고 하는 것이고, 이건 **색인하지
+ * 말라**고 하는 것이다. 누군가 이 주소를 어디에 링크하면 robots.txt 만으로는
+ * 색인될 수 있다 — 둘 다 있어야 한다.
+ *
+ * 비목표에 "포도밭 둘러보기"가 있다. 검색으로 남의 판이 나오면 그 기능이
+ * 뒷문으로 생긴다.
+ */
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
+
 
 /**
  * Login — Figma 201:716 번역.
@@ -65,7 +82,7 @@ export default async function LoginPage({
 
           {error ? (
             <p className={styles.error} data-testid="error">
-              {error}
+              {errorMessage(error)}
             </p>
           ) : null}
 

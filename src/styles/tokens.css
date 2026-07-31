@@ -179,6 +179,8 @@
   --sidebar-top: 93px;           /* 201:647 첫 pill y */
 
   /* 사이드바 세로 스택 — pill 높이 35, 피치 42 → 사이 간격 7 */
+  /* 404·오류 화면의 세로 간격 (STEP 20). 시안이 없어 본문 줄간격에 맞췄다. */
+  --status-gap: 1.5rem;
   --sidebar-gap: 7px;            /* 135 - 93 - 35 */
   --pill-height: 35px;
   --pill-padding-x: 15px;        /* 201:647 px-[15px] */

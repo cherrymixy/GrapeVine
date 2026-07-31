@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { BackLink } from '@/components/back-link';
@@ -9,6 +10,7 @@ import { Pagination } from '@/components/pagination';
 import { Screen } from '@/components/screen';
 import { Sidebar } from '@/components/sidebar';
 import { copy } from '@/data';
+import { errorMessage } from '@/lib/error-message';
 import { createServiceRoleClient } from '@/lib/supabase';
 import { SupabaseVineRepository } from '@/repositories/supabase-vine-repository';
 import { getCurrentUser } from '@/services/auth';
@@ -17,6 +19,21 @@ import { getVisitorPage } from '@/services/vine';
 import { resolveCtaState } from '@/services/visitor';
 
 import styles from './page.module.css';
+
+/*
+ * 색인하지 말 것 (STEP 20).
+ *
+ * `robots.txt` 는 크롤러에게 **오지 말라**고 하는 것이고, 이건 **색인하지
+ * 말라**고 하는 것이다. 누군가 이 주소를 어디에 링크하면 robots.txt 만으로는
+ * 색인될 수 있다 — 둘 다 있어야 한다.
+ *
+ * 비목표에 "포도밭 둘러보기"가 있다. 검색으로 남의 판이 나오면 그 기능이
+ * 뒷문으로 생긴다.
+ */
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
+
 
 type Search = {
   page?: string;
@@ -111,7 +128,7 @@ export default async function OthersVinePage({
 
       {search.error ? (
         <p className={styles.error} data-testid="error">
-          {search.error}
+          {errorMessage(search.error)}
         </p>
       ) : null}
 

@@ -155,12 +155,63 @@ export const copy = {
   // TODO(승아): 빈 상태 문구. PRD §6 는 copy.ts 소관이라고만 하고 문안을 주지 않았다.
   empty: {},
 
-  // TODO(승아): 에러 문구 전량. PRD 에 문안이 없다.
-  // 최소 필요 목록 (STEP 6~7 에서 확정):
-  //   - 없는 슬러그 / 삭제된 판
-  //   - 칭찬 80자 초과
-  //   - 익명 아닌데 이름 미입력
-  //   - 전송 실패(네트워크)
-  //   - 주인 본인은 자기 판에 작성 불가 (PRD §7-7)
-  errors: {},
+  /** 없는 판 (STEP 20). Figma 에 404 시안이 없다. */
+  notFound: {
+    title: 'This vine is gone.',
+    body: 'The link may be wrong, or this vine was never here.',
+    home: 'Go to GRAPEVINE',
+  },
+
+  /** 서버가 넘어졌을 때 (STEP 20). */
+  crashed: {
+    title: 'Something went wrong.',
+    body: 'Not your fault. Try again in a moment.',
+    retry: 'Try again',
+  },
+
+  /*
+   * 에러 문구 (STEP 20).
+   *
+   * ⚠️ 지금까지는 도메인 에러 **코드가 그대로** 화면에 나왔다
+   *    (`MESSAGE_TOO_LONG` 같은 게 사용자에게 보였다). 코드는 우리끼리
+   *    쓰는 말이고 사용자에게는 무엇을 어떻게 고치면 되는지가 필요하다.
+   *
+   * ⚠️ PRD 에도 Figma 에도 문안이 없다. 아래는 내가 쓴 것이라 승아님이
+   *    바꿀 것 — 톤만 맞췄다(짧게, 탓하지 않게, 다음 행동을 알려주게).
+   *
+   * 키는 `lib/errors.ts` 의 `code` 와 1:1 이다. 새 에러를 만들면 여기도
+   *    추가해야 하고, 빠뜨리면 `UNKNOWN` 으로 떨어진다.
+   */
+  errors: {
+    // --- 방문자가 칭찬을 붙일 때 ---
+    EMPTY_MESSAGE: 'Write something first.',
+    MESSAGE_TOO_LONG: 'Keep it under 80 characters.',
+    INVALID_AUTHOR_NAME: 'Leave your name, or choose Unknown.',
+    OWNER_CANNOT_ADD_GRAPE: 'This is your own vine.',
+    PAGE_FULL: 'This page just filled up. Open the next one.',
+    SLOT_TAKEN: 'Someone took that spot. Try once more.',
+
+    // --- 판을 찾을 수 없을 때 ---
+    VINE_NOT_FOUND: 'This vine is gone.',
+    PAGE_NOT_FOUND: 'That page is gone.',
+
+    // --- 계정 ---
+    INVALID_CREDENTIALS: 'Wrong ID or password.',
+    LOGIN_ID_TAKEN: 'That ID is taken.',
+    INVALID_SIGNUP_INPUT: 'Check your ID, password, and name.',
+    OWNER_ALREADY_HAS_VINE: 'You already have a vine.',
+
+    /*
+     * 아래는 사용자가 고칠 수 있는 게 없다. 무슨 일이 있었는지 설명하는
+     * 대신 다시 해보라고만 한다 — 내부 사정을 흘리지 않는다.
+     */
+    AUTH_FAILURE: 'Could not sign you in. Try again.',
+    REPOSITORY_FAILURE: 'Something went wrong. Try again.',
+    SLOT_OUT_OF_RANGE: 'Something went wrong. Try again.',
+    SLUG_COLLISION: 'Something went wrong. Try again.',
+    SLUG_EXHAUSTED: 'Something went wrong. Try again.',
+
+    /** 위에 없는 코드가 오면 여기로. 코드를 그대로 보여 주지 않는다. */
+    UNKNOWN: 'Something went wrong. Try again.',
+  },
 } as const;
