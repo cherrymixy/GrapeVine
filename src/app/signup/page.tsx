@@ -1,3 +1,4 @@
+import { Sidebar } from '@/components/sidebar';
 import { copy } from '@/data';
 
 // 회색박스 (작업규칙 5). 입력은 loginId / password / displayName 셋뿐.
@@ -10,6 +11,7 @@ export default async function SignUpPage({
 
   return (
     <main>
+      <Sidebar variant="guest" />
       <h1>{copy.auth.signUp}</h1>
       {error ? <p data-testid="error">{error}</p> : null}
 

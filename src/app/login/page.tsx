@@ -1,3 +1,4 @@
+import { Sidebar } from '@/components/sidebar';
 import { copy } from '@/data';
 
 // 회색박스 (작업규칙 5). 비주얼은 STEP 10 이후.
@@ -11,6 +12,7 @@ export default async function LoginPage({
 
   return (
     <main>
+      <Sidebar variant="guest" />
       <h1>{copy.auth.logIn}</h1>
       {error ? <p data-testid="error">{error}</p> : null}
 

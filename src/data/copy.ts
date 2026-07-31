@@ -34,8 +34,16 @@ export const copy = {
 
   /** About `/about` — PRD §5.2 */
   about: {
-    // TODO(승아): About 타이틀. PRD 는 "타이틀 + 설명 문단"이라고만 하고 문구를 주지 않았다.
+    // TODO(승아): PRD 는 "타이틀 + 설명 문단"이라고만 하고 타이틀 문구를 주지
+    // 않았다. 회색박스용으로 사이드바 라벨을 그대로 쓴다. 피그마 확정 시 교체.
+    title: 'About',
     body: 'This is a compliment board to share with friends. Create your tree and share the link with your friends. Friends can add compliments to your board and help your grapes grow without logging in.',
+  },
+
+  /** How It Works `/how-it-works` — PRD §5.3. 단계 텍스트는 data/steps.ts. */
+  howItWorks: {
+    // TODO(승아): 타이틀 문구 미지정. 사이드바 라벨을 임시로 쓴다.
+    title: 'How It Works',
   },
 
   /** Login / Sign Up — PRD §5.4 */
@@ -66,6 +74,17 @@ export const copy = {
   setting: {
     title: 'Setting',
     myAccount: 'My Account',
+    /** 미정 4행. PRD §5.7 이 `...` 로 지정했고 확정 전까지 비활성이다. */
+    pending: '...',
+    pendingCount: 4,
+  },
+
+  /** 공통 셸 — PRD §5.0 */
+  shell: {
+    // TODO(승아): 닫기/뒤로 라벨 미지정. 피그마는 `<` 아이콘이다.
+    close: 'Close',
+    back: '<',
+    nextPage: '>',
   },
 
   /** See Grape 모달 — PRD §5.8 */
