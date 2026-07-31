@@ -1,0 +1,36 @@
+/*
+ * 스크롤 진행률 인디케이터 (PRD §5.1).
+ *
+ * ⚠️ Figma 에 이 요소의 시안이 없다. 새 색이나 새 형태를 지어내지 않고
+ *    이미 있는 것만 쓴다 — 채움은 브랜드 마젠타, 트랙은 그 화면의 잉크를
+ *    흐리게. 두께는 이 서비스의 모든 선과 같은 `--border-width`.
+ *    시안이 나오면 이 파일만 바꾸면 된다.
+ */
+
+.indicator {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: var(--border-width);
+  background: color-mix(in srgb, var(--screen-ink) 20%, transparent);
+}
+
+.fill {
+  height: 100%;
+  background: var(--brand);
+  /*
+   * 하네스가 씬에 얹은 값을 그대로 읽는다. width 대신 transform 을 쓰는 건
+   * 매 프레임 레이아웃을 다시 잡지 않기 위해서다 — 스크럽 중에는 이 한
+   * 프레임이 아깝다.
+   */
+  transform: scaleX(var(--scroll-progress, 0));
+  transform-origin: left center;
+}
+
+/* reduce — 스크롤 구간이 없으니 진행률도 없다 (PRD §9.4). */
+@media (prefers-reduced-motion: reduce) {
+  .indicator {
+    display: none;
+  }
+}

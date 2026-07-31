@@ -5,3 +5,4 @@ export {
   type HowItWorksStep,
 } from './steps';
 export { PAGE_CAPACITY, SLOT_LAYOUT, type SlotLayout } from './slot-layout';
+export { MAIN_SCENE, type ScrollScene } from './scroll-cues';

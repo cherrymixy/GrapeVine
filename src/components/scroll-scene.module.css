@@ -1,0 +1,39 @@
+/*
+ * 스크롤 하네스의 구조 (STEP 14 / PRD §9.1 "영상을 sticky 로 pin").
+ *
+ * 긴 구간을 만들고, 그 안에서 화면 하나를 붙잡아 둔다. 굴러가는 건
+ * 스크롤이고 보이는 건 제자리에 멈춘 화면이다 — 스크럽이 성립하는 조건.
+ */
+
+.scene {
+  position: relative;
+  height: calc(var(--scene-length) * 100dvh);
+}
+
+.pin {
+  position: sticky;
+  top: 0;
+  /*
+   * 100dvh 로 못 박는다. 안쪽 Screen 은 min-height 라 늘어날 수 있는데,
+   * 핀이 뷰포트보다 커지면 sticky 가 풀려서 화면이 따라 흐른다.
+   */
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/*
+ * reduce — 스크롤 구간 자체를 없앤다 (PRD §9.4 정적 폴백).
+ *
+ * JS 도 같은 판단을 하지만(useReducedMotion) 그건 마운트 뒤다. 첫 페인트에
+ * 4배 높이가 잠깐이라도 잡히면 스크롤바가 튄다. **CSS 가 먼저 잡는다.**
+ */
+@media (prefers-reduced-motion: reduce) {
+  .scene {
+    height: auto;
+  }
+
+  .pin {
+    position: static;
+    height: auto;
+  }
+}
