@@ -6,7 +6,7 @@ import { copy } from '@/data';
 import { createServiceRoleClient } from '@/lib/supabase';
 import { SupabaseVineRepository } from '@/repositories/supabase-vine-repository';
 import { getCurrentUser } from '@/services/auth';
-import { buildShareUrl } from '@/services/share';
+import { buildShareUrl, resolveOrigin } from '@/services/share';
 
 // 회색박스 (작업규칙 5). 판 렌더와 Create My Vine 배선은 STEP 7.
 export default async function MyVinePage() {
@@ -21,9 +21,11 @@ export default async function MyVinePage() {
 
   // origin 은 요청 헤더에서 얻는다. 배포 도메인을 코드나 env 에 박지 않기 위해서다.
   const headerList = await headers();
-  const host = headerList.get('host') ?? '';
-  const protocol = headerList.get('x-forwarded-proto') ?? (host.startsWith('localhost') ? 'http' : 'https');
-  const shareUrl = vine ? buildShareUrl(`${protocol}://${host}`, vine.slug) : null;
+  const origin = resolveOrigin({
+    host: headerList.get('host'),
+    forwardedProto: headerList.get('x-forwarded-proto'),
+  });
+  const shareUrl = vine ? buildShareUrl(origin, vine.slug) : null;
 
   return (
     <main>
@@ -37,8 +39,12 @@ export default async function MyVinePage() {
           <CopyButton value={shareUrl} />
         </section>
       ) : (
-        // Create My Vine 배선은 이번 범위 밖이다. 판이 없으면 공유할 것도 없다.
-        <p data-testid="no-vine">no vine</p>
+        // PRD §5.5 — 옵션 없음, 버튼 하나. 리빌 연출은 STEP 17.
+        <form method="post" action="/api/vine">
+          <button type="submit" data-testid="create-vine">
+            {copy.myVine.createVine}
+          </button>
+        </form>
       )}
 
       <form method="post" action="/api/auth/logout">

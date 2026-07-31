@@ -1,6 +1,7 @@
 import 'server-only';
 
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { cookies } from 'next/headers';
 
 import { type SignUpInput, normalizeSignUpInput, toSyntheticEmail } from '@/lib/auth';
 import {
@@ -145,6 +146,14 @@ export async function signOut(): Promise<void> {
  * 검증시킨다. 가드에 쓰는 값이므로 반드시 후자여야 한다.
  */
 export async function getCurrentUser(): Promise<User | null> {
+  // 세션 쿠키가 아예 없으면 인증 서버에 물어볼 이유가 없다.
+  // `/v/[slug]` 는 링크 공유형이라 미로그인 방문자가 대부분인데,
+  // 그 전원이 GoTrue 왕복 + DB 조회를 한 번씩 낭비하고 있었다.
+  const cookieStore = await cookies();
+  if (!cookieStore.getAll().some((cookie) => cookie.name.startsWith('sb-'))) {
+    return null;
+  }
+
   const session = await createSessionClient();
   const { data, error } = await session.auth.getUser();
 

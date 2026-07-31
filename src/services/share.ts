@@ -14,6 +14,19 @@ export function buildShareUrl(origin: string, slug: string): string {
   return `${origin.replace(/\/+$/, '')}/v/${slug}`;
 }
 
+/** 프록시 뒤에서도 맞는 origin 을 만든다. 배포 도메인을 코드에 박지 않기 위해. */
+export function resolveOrigin(headers: {
+  host: string | null;
+  forwardedProto: string | null;
+}): string {
+  const host = headers.host ?? 'localhost:3000';
+  // `localhost` 만 보면 127.0.0.1 이나 [::1] 로 접속했을 때 https 로 오판한다.
+  const isLocal = /^(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/.test(host);
+  const protocol = headers.forwardedProto ?? (isLocal ? 'http' : 'https');
+
+  return `${protocol}://${host}`;
+}
+
 /**
  * 클립보드에 복사한다. 브라우저 전용.
  *

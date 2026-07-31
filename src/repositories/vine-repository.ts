@@ -1,4 +1,4 @@
-import type { Grape, PageView, Vine, VinePage } from '@/models';
+import type { Grape, PageView, User, Vine, VinePage } from '@/models';
 
 /**
  * 데이터 계층 인터페이스 — 경로 A(Supabase) ↔ B(Firebase) 교체점.
@@ -59,6 +59,12 @@ export interface VineRepository {
 
   /** 주인의 판. 아직 만들지 않았으면 null. 사용자당 1개라 단수다 (PRD §7-1). */
   getVineByOwnerId(ownerId: string): Promise<Vine | null>;
+
+  /**
+   * 판의 주인. `{이름}'s Vine` / `Compliment {이름}` 표시에 쓴다 (PRD §5.9·§5.10).
+   * FK 가 있으므로 판이 있으면 주인도 반드시 있다.
+   */
+  getOwner(vineId: string): Promise<User | null>;
 
   /** 열람용 파생 뷰. slots 는 항상 capacity 개. 없으면 null. */
   getPage(vineId: string, pageIndex: number): Promise<PageView | null>;

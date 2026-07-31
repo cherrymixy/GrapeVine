@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 import {
+  EmptyMessageError,
   InvalidAuthorNameError,
   MessageTooLongError,
   OwnerAlreadyHasVineError,
@@ -11,7 +12,7 @@ import {
   SlotTakenError,
   SlugCollisionError,
 } from '@/lib/errors';
-import type { Grape, PageSlot, PageView, Vine, VinePage } from '@/models';
+import type { Grape, PageSlot, PageView, User, Vine, VinePage } from '@/models';
 import type {
   AddGrapeOptions,
   AttachedGrape,
@@ -26,6 +27,7 @@ const MESSAGE_LIMIT = 80;
 
 // --- DB 행 (snake_case). 매핑은 이 파일 안에서만 일어난다. --------------------
 
+type UserRow = { id: string; login_id: string; display_name: string; created_at: string };
 type VineRow = { id: string; owner_id: string; slug: string; created_at: string };
 type VinePageRow = { id: string; vine_id: string; page_index: number; capacity: number };
 type GrapeRow = {
@@ -43,6 +45,13 @@ type CreateVineResult = { vine: VineRow; page: VinePageRow };
 
 /** `attach_grape` RPC 의 반환 형태 (jsonb). */
 type AttachGrapeResult = { grape: GrapeRow; next_page: VinePageRow | null };
+
+const toUser = (row: UserRow): User => ({
+  id: row.id,
+  loginId: row.login_id,
+  displayName: row.display_name,
+  createdAt: row.created_at,
+});
 
 const toVine = (row: VineRow): Vine => ({
   id: row.id,
@@ -158,6 +167,17 @@ export class SupabaseVineRepository implements VineRepository {
     return data ? toVine(data) : null;
   }
 
+  async getOwner(vineId: string): Promise<User | null> {
+    const { data, error } = await this.client
+      .from('vines')
+      .select('users!inner(id, login_id, display_name, created_at)')
+      .eq('id', vineId)
+      .maybeSingle<{ users: UserRow }>();
+
+    if (error) throw new RepositoryFailureError('getOwner', { cause: error });
+    return data?.users ? toUser(data.users) : null;
+  }
+
   async listPages(vineId: string): Promise<VinePage[]> {
     const { data, error } = await this.client
       .from('vine_pages')
@@ -258,6 +278,8 @@ export class SupabaseVineRepository implements VineRepository {
           throw new SlotTakenError(pageId, slotIndex, { cause: error });
         case 'grapes_message_length_check':
           throw new MessageTooLongError(MESSAGE_LIMIT, { cause: error });
+        case 'grapes_message_not_blank_check':
+          throw new EmptyMessageError({ cause: error });
         case 'grapes_named_has_name_check':
           throw new InvalidAuthorNameError('named_without_name', { cause: error });
         case 'grapes_anonymous_no_name_check':

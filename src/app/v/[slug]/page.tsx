@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 
+import { copy } from '@/data';
 import { createServiceRoleClient } from '@/lib/supabase';
 import { SupabaseVineRepository } from '@/repositories/supabase-vine-repository';
 import { getCurrentUser } from '@/services/auth';
@@ -36,11 +37,8 @@ export default async function OthersVinePage({
 
   return (
     <main>
-      {/*
-        PRD §5.9 의 타이틀은 `{주인이름}'s Vine` 이지만 주인 displayName 조회는
-        이번 범위 밖이라 넣지 않는다. 슬러그를 이름 자리에 끼우면 틀린 값이
-        화면에 남는다. copy.othersVine.title(name) 배선은 STEP 7.
-      */}
+      <h1>{copy.othersVine.title(visitor.owner.displayName)}</h1>
+
       {/*
         값을 data 속성으로도 내보낸다. 텍스트로만 두면 React 가 인접 표현식
         사이에 주석 노드를 끼워 `1<!-- -->/<!-- -->2` 로 렌더돼서, 화면은
@@ -70,6 +68,26 @@ export default async function OthersVinePage({
         <a data-testid="next-page" href={`/v/${slug}?page=${cta.nextPageIndex}`}>
           {cta.nextPageIndex}
         </a>
+      ) : null}
+
+      {/*
+        Add Grape 폼 (PRD §5.10). 모달·낙하 연출은 STEP 7·18.
+        슬롯을 고르는 입력이 없다 — 서버가 빈 슬롯 중 하나를 배정한다.
+      */}
+      {cta.kind === 'add' ? (
+        <form method="post" action={`/api/v/${slug}/grape`} data-testid="add-grape-form">
+          <input type="hidden" name="page" value={visitor.view.pageIndex} />
+          <label>
+            {copy.auth.displayNameLabel}
+            <input name="authorName" type="text" />
+          </label>
+          <label>
+            {copy.addGrape.anonymous}
+            <input name="isAnonymous" type="checkbox" />
+          </label>
+          <textarea name="message" maxLength={80} required />
+          <button type="submit">{copy.addGrape.send}</button>
+        </form>
       ) : null}
     </main>
   );

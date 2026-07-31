@@ -135,6 +135,69 @@ describe.skipIf(!hasCredentials)('라우트 (실서버)', () => {
       expect(response.status).toBe(404);
     });
 
+    // 핵심 루프: 판 생성 → 링크 공유 → 방문자가 붙이기 → 주인이 열람.
+    it('주인이 판을 만들고 미로그인 방문자가 칭찬을 붙인다', async () => {
+      const loginId = `l${Date.now().toString(36)}`;
+      const signUp = await signUpViaHttp(loginId, 'Blair');
+      const ownerCookie = toCookieHeader(signUp);
+
+      // 1) Create My Vine
+      const created = await fetch(`${BASE}/api/vine`, {
+        method: 'POST',
+        redirect: 'manual',
+        headers: { cookie: ownerCookie },
+      });
+      expect(created.status).toBe(303);
+
+      // 2) /my 에 공유 URL 이 뜬다
+      const my = await fetch(`${BASE}/my`, { redirect: 'manual', headers: { cookie: ownerCookie } });
+      const myHtml = await my.text();
+      const shareUrl = /data-testid="share-url"[^>]*value="([^"]+)"/.exec(myHtml)?.[1];
+      expect(shareUrl).toMatch(/\/v\/[a-z0-9]{10}$/);
+      const slug = shareUrl!.split('/v/')[1];
+
+      // 3) 미로그인 방문자가 붙인다 — 쿠키 없음, 슬롯도 안 고른다
+      const added = await fetch(`${BASE}/api/v/${slug}/grape`, {
+        method: 'POST',
+        redirect: 'manual',
+        headers: { 'content-type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ page: '1', authorName: 'Clara', message: 'You are kind.' }),
+      });
+      expect(added.status).toBe(303);
+      expect(added.headers.get('location')).not.toContain('error=');
+
+      // 4) 판에 반영된다 — 정확히 한 칸
+      const board = await fetch(`${BASE}/v/${slug}`, { redirect: 'manual' });
+      const boardHtml = await board.text();
+      expect(boardHtml).toContain("Blair&#x27;s Vine");
+      expect(boardHtml.match(/data-filled="true"/g)).toHaveLength(1);
+
+      // 5) 주인 본인은 막힌다 (PRD §7-7)
+      const byOwner = await fetch(`${BASE}/api/v/${slug}/grape`, {
+        method: 'POST',
+        redirect: 'manual',
+        headers: {
+          cookie: ownerCookie,
+          'content-type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({ page: '1', authorName: 'Blair', message: 'self praise' }),
+      });
+      expect(byOwner.headers.get('location')).toContain('error=OWNER_CANNOT_ADD_GRAPE');
+
+      // 6) 빈 메시지도 막힌다
+      const blank = await fetch(`${BASE}/api/v/${slug}/grape`, {
+        method: 'POST',
+        redirect: 'manual',
+        headers: { 'content-type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ page: '1', authorName: 'Clara', message: '   ' }),
+      });
+      expect(blank.headers.get('location')).toContain('error=EMPTY_MESSAGE');
+
+      // 막힌 두 번의 시도가 슬롯을 소모하지 않았는지 확인한다.
+      const after = await fetch(`${BASE}/v/${slug}`, { redirect: 'manual' });
+      expect((await after.text()).match(/data-filled="true"/g)).toHaveLength(1);
+    });
+
     it('?page 가 범위 밖이면 1페이지를 보여준다', async () => {
       const loginId = `c${Date.now().toString(36)}`;
       await signUpViaHttp(loginId, 'Clamp');

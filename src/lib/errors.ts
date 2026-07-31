@@ -14,7 +14,9 @@ export type DomainErrorCode =
   | 'SLUG_COLLISION'
   | 'SLUG_EXHAUSTED'
   | 'MESSAGE_TOO_LONG'
+  | 'EMPTY_MESSAGE'
   | 'INVALID_AUTHOR_NAME'
+  | 'PAGE_FULL'
   | 'OWNER_CANNOT_ADD_GRAPE'
   | 'SLOT_OUT_OF_RANGE'
   | 'REPOSITORY_FAILURE'
@@ -134,6 +136,30 @@ export class InvalidAuthorNameError extends DomainError {
     options?: ErrorOptions,
   ) {
     super(`invalid author name: ${reason}`, options);
+  }
+}
+
+/** 공백만 있거나 아예 비어 있는 칭찬. DB `grapes_message_not_blank_check`. */
+export class EmptyMessageError extends DomainError {
+  readonly code = 'EMPTY_MESSAGE' as const;
+
+  constructor(options?: ErrorOptions) {
+    super('message is empty', options);
+  }
+}
+
+/**
+ * 이 페이지에 빈 슬롯이 하나도 없다.
+ * 방문자는 `Here is Full!` 을 보고 다음 페이지로 넘어가야 한다 (PRD §5.9).
+ */
+export class PageFullError extends DomainError {
+  readonly code = 'PAGE_FULL' as const;
+
+  constructor(
+    readonly pageIndex: number,
+    options?: ErrorOptions,
+  ) {
+    super(`page ${pageIndex} is full`, options);
   }
 }
 

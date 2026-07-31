@@ -1,4 +1,4 @@
-import type { PageView, Vine } from '@/models';
+import type { PageView, User, Vine } from '@/models';
 import type { VineRepository } from '@/repositories/vine-repository';
 import { clampPageIndex } from '@/services/visitor';
 
@@ -31,6 +31,8 @@ export async function getPageView(
 
 export type VisitorPage = {
   vine: Vine;
+  /** `{이름}'s Vine` / `Compliment {이름}` 표시용 (PRD §5.9·§5.10). */
+  owner: User;
   view: PageView;
 };
 
@@ -51,10 +53,15 @@ export async function getVisitorPage(
   const pages = await repository.listPages(vine.id);
   const pageIndex = clampPageIndex(rawPage, pages.length);
 
-  const view = await repository.getPage(vine.id, pageIndex);
-  // 판이 있는데 페이지가 없는 건 데이터가 깨진 상태다. 클램프를 통과한
-  // 번호라 여기 도달하면 안 되고, 도달했다면 404 로 감추지 않고 드러낸다.
-  if (!view) return null;
+  const [owner, view] = await Promise.all([
+    repository.getOwner(vine.id),
+    repository.getPage(vine.id, pageIndex),
+  ]);
 
-  return { vine, view };
+  // 클램프가 1..pages.length 를 보장하므로 여기 도달하지 않는다. 도달했다면
+  // 페이지가 사라졌거나 주인이 지워진 것 — 어느 쪽이든 방문자에게는 없는
+  // 판과 같으므로 null 로 내린다(라우트가 404 로 만든다).
+  if (!owner || !view) return null;
+
+  return { vine, owner, view };
 }
