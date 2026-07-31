@@ -27,7 +27,13 @@ export function GrapeBoard({
   dropSlot?: number | null;
 }) {
   return (
-    <div className={styles.board} data-testid="board">
+    /*
+       * `data-stage` 는 스타일 훅이다 (STEP 19a). 세로 화면에서 배경 사진을
+       * 자르지 않고 앉히려면 **판이 있는 화면인지**를 CSS 가 알아야 하는데,
+       * 그건 여기서만 알 수 있다. 테스트용 `data-testid` 를 스타일에 쓰면
+       * 테스트를 고칠 때 화면이 깨지므로 별도 속성으로 둔다.
+       */
+    <div className={styles.board} data-stage data-testid="board">
       {view.slots.map((slot) => {
         const layout = SLOT_LAYOUT[slot.slotIndex];
         // 좌표가 없는 슬롯은 그리지 않는다 — 임의의 자리에 던져 놓으면

@@ -106,3 +106,23 @@
   line-height: var(--line-height-body-tight);
   text-align: center;
 }
+
+/*
+ * 세로 화면 (STEP 19a).
+ * 모달 안쪽 고정폭이 패널 밖으로 나간다 — 패널 대비 비율로 묶는다.
+ */
+@media (max-aspect-ratio: 1 / 1) {
+  .grapeMessage,
+  .settingList {
+    width: calc(var(--panel-size) * 0.78);
+  }
+
+  .shareRow {
+    width: calc(var(--panel-size) * 0.8);
+  }
+
+  .shareUrl {
+    min-width: 0; /* flex 안에서 줄어들 수 있게 — 안 그러면 Copy 버튼을 민다 */
+    flex: 1;
+  }
+}

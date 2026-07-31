@@ -15,6 +15,24 @@
   inset: 0;
 }
 
+/*
+ * 세로 화면 — 판을 프레임 비율(1536:771) 무대로 못 박는다 (STEP 19a).
+ *
+ * `contain` 으로 앉힌 배경 사진과 **정확히 같은 상자**여야 알이 넝쿨 위에
+ * 앉는다. 폭은 화면 전체, 높이는 그 비율, 세로 가운데.
+ */
+@media (max-aspect-ratio: 1 / 1) {
+  .board {
+    top: 50%;
+    right: auto;
+    bottom: auto;
+    left: 0;
+    width: 100%;
+    height: var(--stage-height);
+    translate: 0 -50%;
+  }
+}
+
 .slot {
   position: absolute;
   left: var(--x);

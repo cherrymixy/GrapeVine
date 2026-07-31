@@ -43,3 +43,24 @@
   padding: var(--page-padding-top) var(--page-padding-right) 0 var(--page-padding-left);
   color: var(--screen-ink);
 }
+
+/*
+ * 세로 화면 — 배경을 자르지 않고 **통째로** 앉힌다 (STEP 19a).
+ *
+ * `cover` 는 2:1 사진을 9:19.5 화면에 채우느라 가운데 좁은 띠만 남기고 다
+ * 잘라낸다. 넝쿨이 거대한 줄기 텍스처가 되고, 슬롯 좌표(뷰포트 대비 %)는
+ * 그 위 아무 데나 떠 버린다 — 판이 통째로 무의미해진다.
+ *
+ * 판이 있는 화면에만 적용한다. Main 처럼 좌표가 없는 화면은 잘려도 그림일
+ * 뿐이고, 오히려 꽉 찬 사진이 낫다.
+ */
+@media (max-aspect-ratio: 1 / 1) {
+  .screen:has([data-stage]) .background {
+    object-fit: contain;
+  }
+
+  /* 위아래로 남는 띠. 판 화면은 전부 어두운 계열이다. */
+  .screen[data-tone='dark']:has([data-stage]) {
+    background: var(--bg);
+  }
+}

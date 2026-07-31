@@ -128,3 +128,31 @@
   line-height: var(--line-height-body-tight);
   text-align: center;
 }
+
+/*
+ * 세로 화면 (STEP 19a).
+ *
+ * 입력 칸이 440px 고정이라 390px 화면에서는 패널 밖으로 나간다. 패널 자체도
+ * `--panel-size` 로 이미 줄어들므로, 안쪽도 **패널 폭에 맞춰** 줄인다.
+ * ⚠️ 세로 시안이 없어 새 값을 지어내지 않고 패널 대비 비율로만 묶었다.
+ */
+@media (max-aspect-ratio: 1 / 1) {
+  .message,
+  .authorName,
+  .grapeMessage {
+    width: calc(var(--panel-size) * 0.78);
+  }
+
+  .send {
+    width: calc(var(--panel-size) * 0.64);
+  }
+
+  /*
+   * CTA 를 아래쪽 여백 **한가운데**에 앉힌다 — 무대(사진) 위에 겹치지 않게.
+   * bottom 을 띠의 절반으로 두고 자기 높이의 절반만큼 되밀면 중앙이다.
+   */
+  .cta {
+    bottom: calc(var(--band) / 2);
+    transform: translate(-50%, 50%);
+  }
+}
