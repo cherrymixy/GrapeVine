@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { clamp01, lerpToward, sceneProgress } from './scroll-math';
+import { clamp01, lerpToward, progressToTime, sceneProgress } from './scroll-math';
 
 /**
  * 스크롤 하네스의 계산 (STEP 14).
@@ -89,5 +89,50 @@ describe('clamp01', () => {
 
   it('NaN 은 0 — 진행률이 NaN 이면 currentTime 대입이 통째로 죽는다', () => {
     expect(clamp01(Number.NaN)).toBe(0);
+  });
+});
+
+describe('progressToTime', () => {
+  // 실제 main.mp4: 5.041667초 / 24fps / 121프레임
+  const DURATION = 5.041667;
+  const FRAME = 1 / 24;
+  /** 마지막 프레임이 시작하는 지점 = 120번째 프레임 = 5.0초 */
+  const LAST_FRAME_START = DURATION - FRAME;
+
+  it('0 이면 맨 앞', () => {
+    expect(progressToTime(0, DURATION)).toBe(0);
+  });
+
+  it('1 이면 마지막 프레임 — duration 그대로가 아니다', () => {
+    const time = progressToTime(1, DURATION);
+    expect(time).toBeCloseTo(LAST_FRAME_START, 6);
+    // EOF 에 앉히면 브라우저가 마지막 프레임을 안 그릴 수 있다.
+    expect(time).toBeLessThan(DURATION);
+    // 그렇다고 마지막 프레임보다 앞이면 안 된다.
+    expect(time).toBeGreaterThanOrEqual(DURATION - 2 * FRAME);
+  });
+
+  it('절반이면 절반', () => {
+    expect(progressToTime(0.5, DURATION)).toBeCloseTo(LAST_FRAME_START / 2, 6);
+  });
+
+  it('메타데이터 전 duration=NaN 이면 0 — NaN 대입은 예외를 던진다', () => {
+    expect(progressToTime(0.5, Number.NaN)).toBe(0);
+    expect(Number.isNaN(progressToTime(0.5, Number.NaN))).toBe(false);
+  });
+
+  it('duration 이 Infinity(스트리밍)거나 0 이어도 0', () => {
+    expect(progressToTime(0.5, Number.POSITIVE_INFINITY)).toBe(0);
+    expect(progressToTime(0.5, 0)).toBe(0);
+    expect(progressToTime(0.5, -1)).toBe(0);
+  });
+
+  it('진행률이 범위를 벗어나도 영상 밖으로 나가지 않는다', () => {
+    expect(progressToTime(-5, DURATION)).toBe(0);
+    expect(progressToTime(9, DURATION)).toBeCloseTo(LAST_FRAME_START, 6);
+  });
+
+  it('영상이 한 프레임보다 짧아도 음수가 되지 않는다', () => {
+    expect(progressToTime(1, 0.01)).toBe(0);
   });
 });

@@ -2,6 +2,7 @@ import { DecorGrapes, type DecorGrape } from '@/components/decor-grapes';
 import { Screen } from '@/components/screen';
 import { ScrollProgress } from '@/components/scroll-progress';
 import { ScrollScene } from '@/components/scroll-scene';
+import { ScrubVideo } from '@/components/scrub-video';
 import { Sidebar } from '@/components/sidebar';
 import { MAIN_SCENE, copy } from '@/data';
 
@@ -41,6 +42,18 @@ export default function MainPage() {
   return (
     <ScrollScene length={MAIN_SCENE.length} lerp={MAIN_SCENE.lerp}>
       <Screen background="/images/main_2.png" tone="light" priority>
+        {/*
+          Screen 의 첫 자식이어야 한다. 배경 스틸·영상·장식 포도알이 모두
+          z-index -1 이라 **DOM 순서가 곧 페인트 순서**다 — 여기 있어야
+          스틸 위, 포도알 아래에 앉는다.
+
+          배경 스틸(main_2.png)은 영상의 마지막 프레임이라 reduce 폴백이자
+          영상이 뜨기 전의 바탕이고, 포스터(main_0.png)는 **첫 프레임**이다.
+          포스터로 마지막 프레임을 쓰면 로드 직후 완성된 넝쿨이 빈 화면으로
+          튄다.
+        */}
+        <ScrubVideo src="/video/main.mp4" poster="/images/main_0.png" />
+
         <DecorGrapes grapes={GRAPES} />
         <Sidebar variant="guest" />
 

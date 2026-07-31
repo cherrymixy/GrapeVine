@@ -49,3 +49,27 @@ export function clamp01(value: number): number {
   if (Number.isNaN(value)) return 0;
   return Math.min(Math.max(value, 0), 1);
 }
+
+/**
+ * 진행률을 재생 위치(초)로 (STEP 15).
+ *
+ * 두 가지를 여기서 막는다.
+ *
+ * 1. **메타데이터 전의 `duration`** — `loadedmetadata` 전에는 `NaN` 이다.
+ *    그대로 곱하면 `NaN` 이 되고 `currentTime = NaN` 은 예외를 던져
+ *    스크럽이 통째로 죽는다. 0 을 돌려주고 호출자가 다시 시도하게 한다.
+ *
+ * 2. **끝에서 마지막 프레임을 놓치는 것** — `currentTime = duration` 은
+ *    재생 끝(EOF)이라 브라우저에 따라 마지막 프레임을 그리지 않는다.
+ *    한 프레임 안쪽으로 물려서 확실히 그 프레임에 앉힌다.
+ *
+ * @param frameDuration 한 프레임의 길이(초). 이 영상은 24fps 라 1/24.
+ */
+export function progressToTime(
+  progress: number,
+  duration: number,
+  frameDuration = 1 / 24,
+): number {
+  if (!Number.isFinite(duration) || duration <= 0) return 0;
+  return clamp01(progress) * Math.max(duration - frameDuration, 0);
+}
