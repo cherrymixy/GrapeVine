@@ -27,6 +27,23 @@ export type CreatedVine = {
   firstPage: VinePage;
 };
 
+export type AddGrapeOptions = {
+  /**
+   * 요청한 사람의 User.id. 미로그인 방문자면 null/생략.
+   * 주인이 자기 판에 쓰는 것을 막는 데 쓴다 (PRD §7-7).
+   */
+  actorId?: string | null;
+};
+
+export type AttachedGrape = {
+  grape: Grape;
+  /**
+   * 이 알로 페이지가 꽉 차서 **같은 트랜잭션에서** 만들어진 다음 페이지.
+   * 증설이 없었으면 null. `1/2 >` 페이지네이션이 이 값을 본다.
+   */
+  createdNextPage: VinePage | null;
+};
+
 export interface VineRepository {
   /**
    * 판 생성 (PRD §7-1). Vine + Page 1 을 만든다.
@@ -47,7 +64,8 @@ export interface VineRepository {
   listPages(vineId: string): Promise<VinePage[]>;
 
   /**
-   * 지정한 슬롯을 점유한다 — 이 인터페이스의 핵심 원자 연산.
+   * 지정한 슬롯을 점유하고, **그 알로 페이지가 꽉 차면 같은 트랜잭션에서**
+   * 다음 페이지를 만든다 (절대규칙 2 — 2회 호출로 쪼개지 않는다).
    *
    * 슬롯 **선택**은 여기서 하지 않는다. 확정된 설계상 서버가 빈 슬롯 중 하나를
    * 골라 이 메서드를 부르고, `SlotTakenError` 가 나면 다른 슬롯으로 재시도한다.
@@ -56,8 +74,15 @@ export interface VineRepository {
    *
    * @throws {SlotTakenError} 다른 방문자가 먼저 점유 (PRD §7-4)
    * @throws {PageNotFoundError} 없는 페이지
+   * @throws {SlotOutOfRangeError} slotIndex 가 capacity 범위 밖
    * @throws {MessageTooLongError} 80자 초과
    * @throws {InvalidAuthorNameError} 기명인데 이름 없음
+   * @throws {OwnerCannotAddGrapeError} 주인이 자기 판에 시도 (PRD §7-7)
    */
-  addGrape(pageId: string, slotIndex: number, payload: GrapePayload): Promise<Grape>;
+  addGrape(
+    pageId: string,
+    slotIndex: number,
+    payload: GrapePayload,
+    options?: AddGrapeOptions,
+  ): Promise<AttachedGrape>;
 }

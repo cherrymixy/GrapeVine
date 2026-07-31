@@ -4,13 +4,21 @@ import {
   InvalidAuthorNameError,
   MessageTooLongError,
   OwnerAlreadyHasVineError,
+  OwnerCannotAddGrapeError,
   PageNotFoundError,
   RepositoryFailureError,
+  SlotOutOfRangeError,
   SlotTakenError,
   SlugCollisionError,
 } from '@/lib/errors';
 import type { Grape, PageSlot, PageView, Vine, VinePage } from '@/models';
-import type { CreatedVine, GrapePayload, VineRepository } from '@/repositories/vine-repository';
+import type {
+  AddGrapeOptions,
+  AttachedGrape,
+  CreatedVine,
+  GrapePayload,
+  VineRepository,
+} from '@/repositories/vine-repository';
 import { generateSlug, withUniqueSlug } from '@/services/slug';
 
 /** 칭찬 길이 상한 — DB `grapes_message_length_check` 와 같은 값이어야 한다. */
@@ -32,6 +40,9 @@ type GrapeRow = {
 
 /** `create_vine` RPC 의 반환 형태 (jsonb). */
 type CreateVineResult = { vine: VineRow; page: VinePageRow };
+
+/** `attach_grape` RPC 의 반환 형태 (jsonb). */
+type AttachGrapeResult = { grape: GrapeRow; next_page: VinePageRow | null };
 
 const toVine = (row: VineRow): Vine => ({
   id: row.id,
@@ -190,31 +201,48 @@ export class SupabaseVineRepository implements VineRepository {
     };
   }
 
-  async addGrape(pageId: string, slotIndex: number, payload: GrapePayload): Promise<Grape> {
-    // 절대규칙 3 — 익명이면 이름을 서버에서 버린다. 클라 값을 신뢰하지 않는다.
-    // DB CHECK 가 최종 방어선이지만, 여기서 지우면 애초에 위반이 만들어지지 않는다.
+  /**
+   * 슬롯 점유 + 페이지 증설을 `attach_grape` RPC 한 번으로 처리한다.
+   *
+   * 앱에서 "삽입 후 카운트 후 증설"로 쪼개면 절대규칙 2 가 깨질 뿐 아니라,
+   * 동시에 마지막 두 칸이 채워질 때 양쪽 다 "아직 안 찼다"고 판정해
+   * 다음 페이지가 영영 안 생긴다. RPC 가 페이지 행을 잠그고 처리한다.
+   */
+  async addGrape(
+    pageId: string,
+    slotIndex: number,
+    payload: GrapePayload,
+    options: AddGrapeOptions = {},
+  ): Promise<AttachedGrape> {
+    // 절대규칙 3 은 RPC 안에서도 강제되지만, 여기서 먼저 지워 두면
+    // 애초에 위반이 만들어지지 않는다.
     const authorName = payload.isAnonymous ? null : payload.authorName;
 
     if (!payload.isAnonymous && !authorName) {
       throw new InvalidAuthorNameError('named_without_name');
     }
 
-    const { data, error } = await this.client
-      .from('grapes')
-      .insert({
-        page_id: pageId,
-        slot_index: slotIndex,
-        author_name: authorName,
-        is_anonymous: payload.isAnonymous,
-        message: payload.message,
-      })
-      .select()
-      .single<GrapeRow>();
+    const { data, error } = await this.client.rpc('attach_grape', {
+      p_page_id: pageId,
+      p_slot_index: slotIndex,
+      p_author_name: authorName,
+      p_is_anonymous: payload.isAnonymous,
+      p_message: payload.message,
+      p_actor_id: options.actorId ?? null,
+    });
 
     if (error) {
-      const constraint = constraintName(error);
+      // 제약이 있는 규칙은 제약 이름으로, 제약이 없는 규칙은 커스텀 SQLSTATE 로.
+      switch (error.code) {
+        case 'GV001':
+          throw new OwnerCannotAddGrapeError({ cause: error });
+        case 'GV002':
+          throw new SlotOutOfRangeError(slotIndex, { cause: error });
+        case 'GV003':
+          throw new PageNotFoundError({ pageId }, { cause: error });
+      }
 
-      switch (constraint) {
+      switch (constraintName(error)) {
         case 'grapes_slot_key':
           throw new SlotTakenError(pageId, slotIndex, { cause: error });
         case 'grapes_message_length_check':
@@ -230,6 +258,14 @@ export class SupabaseVineRepository implements VineRepository {
       }
     }
 
-    return toGrape(data);
+    const result = data as AttachGrapeResult | null;
+    if (!result?.grape) {
+      throw new RepositoryFailureError('addGrape/unexpected-rpc-shape');
+    }
+
+    return {
+      grape: toGrape(result.grape),
+      createdNextPage: result.next_page ? toVinePage(result.next_page) : null,
+    };
   }
 }

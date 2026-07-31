@@ -15,6 +15,8 @@ export type DomainErrorCode =
   | 'SLUG_EXHAUSTED'
   | 'MESSAGE_TOO_LONG'
   | 'INVALID_AUTHOR_NAME'
+  | 'OWNER_CANNOT_ADD_GRAPE'
+  | 'SLOT_OUT_OF_RANGE'
   | 'REPOSITORY_FAILURE'
   | 'INVALID_SIGNUP_INPUT'
   | 'LOGIN_ID_TAKEN'
@@ -132,6 +134,34 @@ export class InvalidAuthorNameError extends DomainError {
     options?: ErrorOptions,
   ) {
     super(`invalid author name: ${reason}`, options);
+  }
+}
+
+/**
+ * PRD §7-7 — 주인은 자기 판에 칭찬을 쓸 수 없다.
+ * `attach_grape` RPC 가 SQLSTATE `GV001` 로 던진다.
+ */
+export class OwnerCannotAddGrapeError extends DomainError {
+  readonly code = 'OWNER_CANNOT_ADD_GRAPE' as const;
+
+  constructor(options?: ErrorOptions) {
+    super('owner cannot add a grape to their own vine', options);
+  }
+}
+
+/**
+ * slotIndex 가 페이지 capacity 범위 밖.
+ * 상한이 `vine_pages.capacity` 라 테이블 CHECK 로 표현할 수 없어 RPC 가
+ * SQLSTATE `GV002` 로 던진다.
+ */
+export class SlotOutOfRangeError extends DomainError {
+  readonly code = 'SLOT_OUT_OF_RANGE' as const;
+
+  constructor(
+    readonly slotIndex: number,
+    options?: ErrorOptions,
+  ) {
+    super(`slot index out of range: ${slotIndex}`, options);
   }
 }
 

@@ -1,4 +1,6 @@
 export type {
+  AddGrapeOptions,
+  AttachedGrape,
   CreatedVine,
   GrapePayload,
   VineRepository,

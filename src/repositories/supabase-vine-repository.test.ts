@@ -82,7 +82,7 @@ describe.skipIf(!hasCredentials)('SupabaseVineRepository (원격 왕복)', () =>
     expect(await repository.listPages(vine.id)).toEqual([firstPage]);
 
     // --- 슬롯 점유 ---
-    const grape = await repository.addGrape(firstPage.id, 3, {
+    const { grape, createdNextPage } = await repository.addGrape(firstPage.id, 3, {
       authorName: 'Clara',
       isAnonymous: false,
       message: 'You are kind.',
@@ -90,6 +90,7 @@ describe.skipIf(!hasCredentials)('SupabaseVineRepository (원격 왕복)', () =>
 
     expect(grape.slotIndex).toBe(3);
     expect(grape.authorName).toBe('Clara');
+    expect(createdNextPage).toBeNull();
 
     const afterAdd = await repository.getPage(vine.id, 1);
     expect(afterAdd!.slots[3].grape).toEqual(grape);
@@ -102,7 +103,7 @@ describe.skipIf(!hasCredentials)('SupabaseVineRepository (원격 왕복)', () =>
       isAnonymous: true,
       message: 'anonymous praise',
     });
-    expect(anonymous.authorName).toBeNull();
+    expect(anonymous.grape.authorName).toBeNull();
 
     // --- 절대규칙 1: 같은 슬롯 재점유는 DB가 거부한다 ---
     await expect(
