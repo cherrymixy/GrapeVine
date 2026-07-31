@@ -1,0 +1,36 @@
+/*
+ * 원형 패널 (Figma 201:730 Ellipse 5031 — 523×523).
+ *
+ * Login / Sign Up 은 화면 한가운데, 모달 4종은 딤 위에 같은 원을 쓴다.
+ * 지름이 고정이라 안쪽 값도 rem 으로 둔다 — 원이 커지면 내용이 원 밖으로
+ * 삐져나가므로 함께 바뀌어야 한다.
+ */
+
+.panel {
+  display: flex;
+  box-sizing: border-box;
+  width: var(--panel-size);
+  height: var(--panel-size);
+  flex-direction: column;
+  align-items: center;
+  border-radius: var(--radius-pill);
+  background: var(--panel);
+  color: var(--text);
+}
+
+/* 화면 한가운데 놓이는 형태 (Login·Sign Up). 프레임 중앙과 일치한다. */
+.centered {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.title {
+  /* 201:731 top 244 — 패널 상단(124)에서 120 */
+  margin: 7.5rem 0 0;
+  font-size: var(--font-size-title);
+  font-weight: var(--font-weight);
+  line-height: var(--line-height-title);
+  text-align: center;
+}

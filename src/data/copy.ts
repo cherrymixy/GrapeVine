@@ -89,6 +89,8 @@ export const copy = {
   auth: {
     idLabel: 'ID',
     passwordLabel: 'PASSWORD',
+    /** 패널 타이틀 (201:731). 버튼의 `Log in` 과 I 의 대소문자가 다르다. */
+    logInTitle: 'Log In',
     logIn: 'Log in',
     signUpPrompt: "Don't have an account?",
     signUp: 'Sign Up',

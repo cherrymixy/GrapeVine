@@ -49,5 +49,5 @@
  * 눌러도 같은 자리라 링크 자체를 죽이지는 않고 흐리게만 둔다.
  */
 .pill[aria-current='page'] {
-  opacity: var(--pill-current-opacity);
+  opacity: var(--dim-opacity);
 }

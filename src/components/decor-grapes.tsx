@@ -19,13 +19,26 @@ export type DecorGrape = {
  * 텍스트보다 **뒤에** 깔린다 (Figma 레이어 순서). About 은 포도알이 헤드라인과
  * 겹치는데, 글자가 위에 와야 시안과 같다.
  */
-export function DecorGrapes({ grapes }: { grapes: readonly DecorGrape[] }) {
+/**
+ * `grape` 는 포도알 색(Main·About), `panel` 은 패널과 같은 옅은 면
+ * (Login·Sign Up — 바탕 위에 거의 안 보일 만큼 옅게 얹힌다).
+ */
+export type DecorTone = 'grape' | 'panel';
+
+export function DecorGrapes({
+  grapes,
+  tone = 'grape',
+}: {
+  grapes: readonly DecorGrape[];
+  tone?: DecorTone;
+}) {
   return (
     <>
       {grapes.map((grape) => (
         <span
           key={`${grape.x}-${grape.y}`}
           className={styles.grape}
+          data-tone={tone}
           style={{
             left: `${grape.x}%`,
             top: `${grape.y}%`,

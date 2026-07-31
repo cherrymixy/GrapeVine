@@ -16,6 +16,17 @@
    */
   z-index: -1;
   border-radius: var(--radius-pill);
-  background: var(--grape-filled);
   transform: translate(-50%, -50%);
+}
+
+.grape[data-tone='grape'] {
+  background: var(--grape-filled);
+}
+
+/*
+ * Login·Sign Up 의 배경 원 (201:717~201:722).
+ * 패널과 같은 면 색이라 바탕 위에 아주 옅게만 드러난다.
+ */
+.grape[data-tone='panel'] {
+  background: var(--panel);
 }

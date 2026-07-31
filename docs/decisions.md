@@ -279,3 +279,20 @@ STEP 15 에서 `-g 1 -keyint_min 1 -crf 24 -vf scale=1440:-2 -movflags +faststar
 - **`04` 는 "A Friend" 로 F 가 대문자다** — PRD §5.3 은 소문자인데 Figma 가 대문자다. 비주얼 SSOT 를 따랐다.
 
 결과: Main·About·How It Works 세 화면이 시안과 조판까지 일치한다.
+
+### Login / Sign Up (201:716)
+
+- **원형 패널을 `components/panel.tsx` 로 뽑았다** — Login·Sign Up 은 화면 한가운데, 모달 4종은 딤 위에 **같은 원(523)** 을 쓴다. `centered` 로만 가른다. 지름이 고정이라 안쪽 값도 rem 이다 — 원이 커지면 내용이 원 밖으로 삐져나가므로 함께 바뀌어야 한다.
+- **입력 필드는 각지고 보더가 1px** — pill(999 / 2px)과 다른 규칙이다. placeholder 는 `--dim-opacity`.
+- **파랑이 두 군데에 쓰인다** — 선택 하이라이트(201:653)와 `Sign Up` 링크(201:740)가 같은 `#0061f3` 이다. `--blue` 를 바탕으로 `--selection-caret` / `--link` 를 파생시켰다.
+- **`--pill-current-opacity` 를 `--dim-opacity` 로 통합** — 현재 화면 pill 과 placeholder 가 같은 30% 다. 이름이 둘이면 한쪽만 바뀌어 어긋난다.
+- **타이틀 `Log In` 과 버튼 `Log in` 은 다른 문구다** — I 의 대소문자가 다르다(201:731 vs 201:737). `copy.auth.logInTitle` 을 따로 뒀다.
+- ⚠️ **Sign Up 프레임이 Figma 에 없다** — Login 구조를 그대로 쓰고 displayName 필드를 하나 더했다. 시안이 나오면 교체할 것.
+
+#### ⚠️ `--panel` 값이 틀렸다 (수정 필요)
+
+Login 배경은 `#eae9e3`(201:716 프레임 fill, 코드에서 읽음)이고, 그 위에 패널(523)과 배경 원 6개가 **눈에 보이게 더 밝다**. 그런데 지금 `--panel` 은 `#eae9e3` — 배경과 같은 값이라 **렌더에서 통째로 사라진다.**
+
+STEP 10c 에서 `--panel = #eae9e3` 로 확정한 근거는 "모달 패널이 CTA 버튼 배경과 같아 보인다"였는데, 그 모달은 **어두운 사진 위 딤** 위에 있어서 같은 값으로도 밝게 읽혔다. 평평한 `#eae9e3` 위에서는 성립하지 않는다.
+
+Ellipse 가 PNG 라 값을 읽을 수 없고 픽셀 샘플링은 작업규칙 8 위반이다. **패널 색을 값으로 받아야 한다.**
