@@ -1,0 +1,9 @@
+<!--
+  파비콘 — 토큰에서 파생한 것이고 새로 디자인한 것이 아니다.
+  bg #070708 (= --bg) 위에 포도알 #bf00f3 (= --brand / --grape-filled).
+  피그마에 파비콘 시안이 없어 확정된 값만 조합했다. 시안이 나오면 교체할 것.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <rect width="32" height="32" fill="#070708"/>
+  <circle cx="16" cy="16" r="9" fill="#bf00f3"/>
+</svg>
