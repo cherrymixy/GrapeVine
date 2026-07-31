@@ -132,9 +132,16 @@ export async function signIn(loginId: string, password: string): Promise<User> {
   });
 }
 
+/**
+ * 로그아웃.
+ *
+ * ⚠️ `scope: 'local'` 이 필수다. Supabase 기본값은 `'global'` 이라 그 계정의
+ *    **모든 세션**을 끊는다 — 노트북에서 로그아웃하면 폰에서도 로그아웃된다.
+ *    실제로 밟았다(기기 두 대를 흉내내 확인). 지금 이 브라우저만 끊는다.
+ */
 export async function signOut(): Promise<void> {
   const session = await createSessionClient();
-  const { error } = await session.auth.signOut();
+  const { error } = await session.auth.signOut({ scope: 'local' });
   if (error) throw new AuthFailureError('signOut', { cause: error });
 }
 

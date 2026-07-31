@@ -24,3 +24,7 @@
 .copy[data-state='failed'] {
   opacity: var(--dim-opacity);
 }
+
+.copy:hover {
+  filter: brightness(0.94);
+}

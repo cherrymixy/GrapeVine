@@ -28,5 +28,5 @@
  * 패널과 같은 면 색이라 바탕 위에 아주 옅게만 드러난다.
  */
 .grape[data-tone='panel'] {
-  background: var(--panel);
+  background: var(--panel-on-surface);
 }

@@ -51,3 +51,21 @@
 .pill[aria-current='page'] {
   opacity: var(--dim-opacity);
 }
+
+/*
+ * hover — Figma 에 시안이 없다. 누를 수 있다는 신호가 없으면 pill 이 그냥
+ * 라벨처럼 보인다. 새 색을 만들지 않고 현재 색을 채움으로 뒤집는다.
+ */
+.pill:hover:not([aria-current='page']) {
+  background: currentColor;
+  color: var(--panel);
+}
+
+/*
+ * 방문자 화면의 제목 겸 pill (201:787).
+ * .sidebar 와 .pill 을 함께 쓰므로 h1 기본 여백만 지운다.
+ */
+h1.sidebar {
+  margin: 0;
+  font-weight: var(--font-weight);
+}

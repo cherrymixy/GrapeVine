@@ -26,14 +26,15 @@ export function Sidebar({
   ownerName?: string;
 }) {
   if (variant === 'visitor') {
+    /*
+     * 방문자 화면에는 이것 말고 제목이 없다 (Figma 201:787 — pill 하나뿐).
+     * 갈 곳이 없어 링크도 아니므로 `nav` 가 아니라 **페이지 제목**으로 둔다.
+     * `nav` 안의 span 으로 두면 이 화면에 h1 이 아예 없어진다.
+     */
     return (
-      <nav className={styles.sidebar} data-testid="sidebar" data-variant={variant}>
-        <ul className={styles.list}>
-          <li>
-            <span className={styles.pill}>{copy.othersVine.title(ownerName ?? '')}</span>
-          </li>
-        </ul>
-      </nav>
+      <h1 className={`${styles.sidebar} ${styles.pill}`} data-testid="sidebar" data-variant={variant}>
+        {copy.othersVine.title(ownerName ?? '')}
+      </h1>
     );
   }
 

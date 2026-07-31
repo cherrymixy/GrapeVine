@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 
+import { BackLink } from '@/components/back-link';
 import { CtaButton } from '@/components/cta-button';
 import { GrapeBoard } from '@/components/grape-board';
 import { Modal } from '@/components/modal';
@@ -58,6 +59,8 @@ export default async function OthersVinePage({
       ? (view.slots.find((slot) => slot.slotIndex === openedSlot)?.grape ?? null)
       : null;
 
+  const modalOpen = openedGrape !== null || (search.modal === 'add' && cta.kind === 'add');
+
   return (
     <Screen background="/images/myvine_2.png" tone="dark" priority>
       <GrapeBoard view={view} slotHref={(slotIndex) => `${base}&grape=${slotIndex}`} />
@@ -65,11 +68,16 @@ export default async function OthersVinePage({
       {/* PRD §5.0 — 방문자 GNB 는 `{이름}'s Vine` 단일 항목이다. */}
       <Sidebar variant="visitor" ownerName={owner.displayName} />
 
-      <Pagination
-        pageIndex={view.pageIndex}
-        totalPages={view.totalPages}
-        hrefFor={(page) => `/v/${slug}?page=${page}`}
-      />
+      {/* 모달이 열리면 좌상단이 뒤로가기로 바뀐다 (Figma 201:904 / 201:979). */}
+      {modalOpen ? (
+        <BackLink href={base} />
+      ) : (
+        <Pagination
+          pageIndex={view.pageIndex}
+          totalPages={view.totalPages}
+          hrefFor={(page) => `/v/${slug}?page=${page}`}
+        />
+      )}
 
       {/* CTA 3분기 — 판정은 resolveCtaState 가 한다 (PRD §5.9). */}
       <div className={styles.cta}>

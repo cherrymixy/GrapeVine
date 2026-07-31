@@ -1,6 +1,7 @@
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
+import { BackLink } from '@/components/back-link';
 import { CopyButton } from '@/components/copy-button';
 import { CtaButton } from '@/components/cta-button';
 import { GrapeBoard } from '@/components/grape-board';
@@ -39,6 +40,7 @@ export default async function MyVinePage({ searchParams }: { searchParams: Promi
   if (!vine) {
     return (
       <Screen background="/images/myvine_1.png" tone="dark" priority>
+        <h1 className="srOnly">{copy.nav.myVine}</h1>
         {search.error ? (
           <p className={styles.error} data-testid="error">
             {search.error}
@@ -74,16 +76,31 @@ export default async function MyVinePage({ searchParams }: { searchParams: Promi
       ? (view.slots.find((slot) => slot.slotIndex === openedSlot)?.grape ?? null)
       : null;
 
+  const modalOpen =
+    openedGrape !== null || ['share', 'setting', 'account'].includes(search.modal ?? '');
+
   return (
     <Screen background="/images/myvine_2.png" tone="dark" priority>
+      {/* 시안에는 제목 글자가 없다(201:753). 보이지 않게만 넣는다. */}
+      <h1 className="srOnly">{copy.nav.myVine}</h1>
+
       <GrapeBoard view={view} slotHref={(slotIndex) => `${base}&grape=${slotIndex}`} />
       <Sidebar variant="owner" current="/my" />
 
-      <Pagination
-        pageIndex={view.pageIndex}
-        totalPages={view.totalPages}
-        hrefFor={(page) => `/my?page=${page}`}
-      />
+      {/*
+        좌상단은 평소 페이지네이션이지만 모달이 열리면 뒤로가기로 바뀐다
+        (Figma 201:791 / 201:823 / 201:979 는 모두 `<` 를 그린다).
+        모달을 닫는 길이 딤 말고도 하나 더 있어야 한다.
+      */}
+      {modalOpen ? (
+        <BackLink href={base} />
+      ) : (
+        <Pagination
+          pageIndex={view.pageIndex}
+          totalPages={view.totalPages}
+          hrefFor={(page) => `/my?page=${page}`}
+        />
+      )}
 
       {search.error ? (
         <p className={styles.error} data-testid="error">
@@ -94,7 +111,13 @@ export default async function MyVinePage({ searchParams }: { searchParams: Promi
       {search.modal === 'share' ? (
         <Modal title={copy.share.title} label={copy.share.title} titleTop={10.5} closeHref={base} testId="share-modal">
           <div className={styles.shareRow}>
-            <input className={styles.shareUrl} data-testid="share-url" readOnly value={shareUrl} />
+            <input
+              className={styles.shareUrl}
+              data-testid="share-url"
+              aria-label={copy.share.title}
+              readOnly
+              value={shareUrl}
+            />
             <CopyButton value={shareUrl} />
           </div>
         </Modal>
@@ -122,6 +145,35 @@ export default async function MyVinePage({ searchParams }: { searchParams: Promi
               </li>
             ))}
           </ul>
+        </Modal>
+      ) : null}
+
+      {/*
+        My Account — Setting 의 첫 행이 여는 곳.
+        ⚠️ Figma 에 이 프레임이 없다. 그런데 Setting 의 `My Account >` 가
+           갈 데가 없으면 죽은 링크가 되고, 무엇보다 **로그아웃할 방법이
+           아무 데도 없다.** 계정 화면이 로그아웃의 제자리라 최소로 만들었다.
+           시안이 나오면 교체할 것.
+      */}
+      {search.modal === 'account' ? (
+        <Modal
+          title={copy.setting.myAccount}
+          label={copy.setting.myAccount}
+          titleTop={6.1875}
+          closeHref={`${base}&modal=setting`}
+          testId="account-modal"
+        >
+          <dl className={styles.account}>
+            <dt>{copy.auth.idLabel}</dt>
+            <dd data-testid="account-login-id">{user.loginId}</dd>
+            <dt>{copy.auth.displayNameLabel}</dt>
+            <dd data-testid="account-display-name">{user.displayName}</dd>
+          </dl>
+          <form method="post" action="/api/auth/logout">
+            <button className={styles.logout} type="submit" data-testid="logout">
+              {copy.auth.logOut}
+            </button>
+          </form>
         </Modal>
       ) : null}
 

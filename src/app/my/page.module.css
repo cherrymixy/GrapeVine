@@ -66,6 +66,36 @@
   opacity: var(--dim-opacity);
 }
 
+/* --- My Account (Figma 에 프레임 없음 — Setting 행의 목적지) --- */
+
+.account {
+  width: 22.5rem;
+  margin: 2.8125rem 0 0;
+  font-size: var(--font-size-body);
+}
+
+.account dt {
+  opacity: var(--dim-opacity);
+  font-size: var(--font-size-fine);
+}
+
+.account dd {
+  margin: 0 0 1rem;
+}
+
+.logout {
+  box-sizing: border-box;
+  width: 22.5rem;
+  height: var(--field-height);
+  border: 0;
+  border-radius: var(--radius-field);
+  background: var(--brand);
+  color: var(--text-on-brand);
+  font: inherit;
+  font-size: var(--font-size-body);
+  line-height: 1;
+}
+
 /* --- See Grape (201:1023) --- */
 
 .grapeMessage {

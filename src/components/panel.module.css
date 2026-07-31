@@ -22,11 +22,17 @@
   color: var(--text);
 }
 
-/* 화면 한가운데 (Login·Sign Up). 프레임 중앙과 일치한다. */
+/*
+ * 화면 한가운데 (Login·Sign Up). 프레임 중앙과 일치한다.
+ *
+ * 여기서는 바탕이 딤이 아니라 같은 면 색(--surface)이라, 모달과 같은
+ * --panel 로 두면 원이 통째로 사라진다. 한 단계 밝은 값을 쓴다.
+ */
 .centered {
   position: absolute;
   top: 50%;
   left: 50%;
+  background: var(--panel-on-surface);
   transform: translate(-50%, -50%);
 }
 

@@ -54,3 +54,8 @@
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
+/* hover — 새 색 없이 밝기만 살짝 줄인다. 시안에 상태 정의가 없다. */
+.cta:hover:not(:disabled) {
+  filter: brightness(0.94);
+}
