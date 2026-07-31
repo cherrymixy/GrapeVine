@@ -57,6 +57,9 @@ export interface VineRepository {
   /** 공유 링크 진입점. 없으면 null (에러 아님 — 404 는 라우트가 판단한다). */
   getVineBySlug(slug: string): Promise<Vine | null>;
 
+  /** 주인의 판. 아직 만들지 않았으면 null. 사용자당 1개라 단수다 (PRD §7-1). */
+  getVineByOwnerId(ownerId: string): Promise<Vine | null>;
+
   /** 열람용 파생 뷰. slots 는 항상 capacity 개. 없으면 null. */
   getPage(vineId: string, pageIndex: number): Promise<PageView | null>;
 

@@ -147,6 +147,17 @@ export class SupabaseVineRepository implements VineRepository {
     return data ? toVine(data) : null;
   }
 
+  async getVineByOwnerId(ownerId: string): Promise<Vine | null> {
+    const { data, error } = await this.client
+      .from('vines')
+      .select()
+      .eq('owner_id', ownerId)
+      .maybeSingle<VineRow>();
+
+    if (error) throw new RepositoryFailureError('getVineByOwnerId', { cause: error });
+    return data ? toVine(data) : null;
+  }
+
   async listPages(vineId: string): Promise<VinePage[]> {
     const { data, error } = await this.client
       .from('vine_pages')

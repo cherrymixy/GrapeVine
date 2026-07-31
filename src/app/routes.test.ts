@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
+import { PAGE_CAPACITY } from '@/data/slot-layout';
 import { createServiceRoleClient } from '@/lib/supabase';
 import { SupabaseVineRepository } from '@/repositories/supabase-vine-repository';
 
@@ -46,7 +47,7 @@ function toCookieHeader(response: Response): string {
     .join('; ');
 }
 
-describe.skipIf(!hasCredentials)('auth 라우트 가드 (실서버)', () => {
+describe.skipIf(!hasCredentials)('라우트 (실서버)', () => {
   let server: ChildProcess;
   let admin: SupabaseClient;
   const createdAuthUserIds: string[] = [];
@@ -125,5 +126,50 @@ describe.skipIf(!hasCredentials)('auth 라우트 가드 (실서버)', () => {
 
     expect(response.status).toBe(200);
     expect(response.headers.get('location')).toBeNull();
+  });
+
+  describe('방문자 라우트', () => {
+    it('없는 슬러그는 404 다', async () => {
+      const response = await fetch(`${BASE}/v/nosuchslug`, { redirect: 'manual' });
+
+      expect(response.status).toBe(404);
+    });
+
+    it('?page 가 범위 밖이면 1페이지를 보여준다', async () => {
+      const loginId = `c${Date.now().toString(36)}`;
+      await signUpViaHttp(loginId, 'Clamp');
+      const ownerId = createdAuthUserIds.at(-1)!;
+
+      const repository = new SupabaseVineRepository(admin);
+      const { vine, firstPage } = await repository.createVine(ownerId);
+
+      // 15칸을 채워 페이지 2를 만든다 — 클램프가 실제 페이지 수를 본다는 걸
+      // 보이려면 페이지가 둘 이상이어야 한다.
+      for (let slotIndex = 0; slotIndex < PAGE_CAPACITY; slotIndex += 1) {
+        await repository.addGrape(firstPage.id, slotIndex, {
+          authorName: 'Clara',
+          isAnonymous: false,
+          message: `praise ${slotIndex}`,
+        });
+      }
+
+      const pageOf = async (query: string) => {
+        const response = await fetch(`${BASE}/v/${vine.slug}${query}`, { redirect: 'manual' });
+        expect(response.status).toBe(200);
+        const html = await response.text();
+        const tag = /<p[^>]*data-testid="pagination"[^>]*>/.exec(html)?.[0] ?? '';
+        return [
+          /data-page="(\d+)"/.exec(tag)?.[1],
+          /data-total="(\d+)"/.exec(tag)?.[1],
+        ];
+      };
+
+      expect(await pageOf('')).toEqual(['1', '2']);
+      expect(await pageOf('?page=2')).toEqual(['2', '2']);
+      // 범위 밖은 전부 1로.
+      expect(await pageOf('?page=99')).toEqual(['1', '2']);
+      expect(await pageOf('?page=0')).toEqual(['1', '2']);
+      expect(await pageOf('?page=abc')).toEqual(['1', '2']);
+    });
   });
 });

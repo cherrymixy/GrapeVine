@@ -1,5 +1,6 @@
-import type { PageView } from '@/models';
+import type { PageView, Vine } from '@/models';
 import type { VineRepository } from '@/repositories/vine-repository';
+import { clampPageIndex } from '@/services/visitor';
 
 /**
  * 판 열람 유스케이스.
@@ -26,4 +27,34 @@ export async function getPageView(
   if (!vine) return null;
 
   return repository.getPage(vine.id, pageIndex);
+}
+
+export type VisitorPage = {
+  vine: Vine;
+  view: PageView;
+};
+
+/**
+ * `/v/[slug]` 가 필요한 것 전부를 한 번에.
+ *
+ * 라우트가 `?page` 를 직접 해석하지 않도록 클램프까지 여기서 끝낸다.
+ * 판이 없으면 `null` — 404 로 만들지 여부는 라우트가 판단한다.
+ */
+export async function getVisitorPage(
+  repository: VineRepository,
+  slug: string,
+  rawPage: string | string[] | undefined,
+): Promise<VisitorPage | null> {
+  const vine = await repository.getVineBySlug(slug);
+  if (!vine) return null;
+
+  const pages = await repository.listPages(vine.id);
+  const pageIndex = clampPageIndex(rawPage, pages.length);
+
+  const view = await repository.getPage(vine.id, pageIndex);
+  // 판이 있는데 페이지가 없는 건 데이터가 깨진 상태다. 클램프를 통과한
+  // 번호라 여기 도달하면 안 되고, 도달했다면 404 로 감추지 않고 드러낸다.
+  if (!view) return null;
+
+  return { vine, view };
 }
