@@ -1,0 +1,21 @@
+/*
+ * 이미지 시퀀스 캔버스 (STEP 19b).
+ * 영상(`scrub-video.module.css`)과 **정확히 같은 상자·같은 규칙**이라야
+ * 기기에 따라 화면이 달라 보이지 않는다.
+ */
+
+.canvas {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* reduce — 배경 스틸이 곧 마지막 프레임이다 (PRD §9.4). */
+@media (prefers-reduced-motion: reduce) {
+  .canvas {
+    display: none;
+  }
+}

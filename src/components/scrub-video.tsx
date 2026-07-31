@@ -28,10 +28,19 @@ import styles from './scrub-video.module.css';
 export function ScrubVideo({
   src,
   poster,
+  enabled = true,
 }: {
   src: string;
   /** 영상의 **첫 프레임**. 마지막 프레임을 쓰면 로드 직후 화면이 튄다. */
   poster: string;
+  /**
+   * false 면 **영상을 내려받지 않는다** (STEP 19b). 포스터만 띄운 채 기다린다.
+   *
+   * 기기가 이미지 시퀀스를 쓸지 판단하는 건 마운트 뒤에만 가능한데, 그때까지
+   * 영상을 받아 버리면 시퀀스로 갈아타도 이미 늦다 — reduce 에서 밟았던 것과
+   * 똑같은 함정이다(STEP 15). 그래서 판단이 끝날 때까지 아예 안 받는다.
+   */
+  enabled?: boolean;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const { subscribe, reducedMotion } = useScrollScene();
@@ -39,6 +48,8 @@ export function ScrubVideo({
   useEffect(() => {
     // reduce 면 영상을 아예 안 그린다 — 아래 렌더에서 null 이다.
     if (reducedMotion) return;
+    // 아직 이 기기가 영상을 쓸지 모른다. 포스터만 띄우고 기다린다 (STEP 19b).
+    if (!enabled) return;
 
     /*
      * ⚠️ 여기서 **한 번 더** 직접 읽는다. 중복이 아니라 다른 시점의 값이다.
@@ -103,7 +114,7 @@ export function ScrubVideo({
       video.removeEventListener('seeked', flush);
       video.removeEventListener('loadedmetadata', flush);
     };
-  }, [src, subscribe, reducedMotion]);
+  }, [src, enabled, subscribe, reducedMotion]);
 
   /*
    * reduce — 영상을 내려받지도 않는다 (PRD §9.4). 아래에 깔린 배경 스틸이

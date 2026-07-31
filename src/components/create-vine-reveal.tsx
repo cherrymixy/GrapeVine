@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 
-import { MY_VINE_REVEAL } from '@/data';
+import { IMAGE_SEQUENCE, MY_VINE_REVEAL } from '@/data';
+import { prefersImageSequence } from '@/lib/motion-mode';
 
 import styles from './create-vine-reveal.module.css';
 
@@ -60,8 +61,30 @@ export function CreateVineReveal({
    * 마크업에 두면 그 HTML 이 그대로 나가 버린다. `useSyncExternalStore`
    * 대신 여기서 직접 읽는 것도 같은 이유다(하이드레이션 중엔 서버 값이 온다).
    */
+  /** 모바일이면 영상(7.8MB) 대신 이미지 11장(187KB). null = 아직 판단 전. */
+  const framesRef = useRef<HTMLImageElement[] | null>(null);
+
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    /*
+     * 모바일에서는 영상을 아예 안 받는다 (STEP 19b).
+     *
+     * 이 리빌은 **이산 10단계**라 실제로 화면에 나오는 그림이 11장뿐이다
+     * (`floor(t*10)/10` → 0, 0.1 … 1.0). 121프레임짜리 7.8MB 영상을 받아
+     * 그중 11장만 보여 주는 셈이었다. 187KB 로 같은 연출을 한다.
+     */
+    if (prefersImageSequence()) {
+      const { dir, frames } = IMAGE_SEQUENCE.reveal;
+      framesRef.current = Array.from({ length: frames }, (_, step) => {
+        const image = new Image();
+        image.decoding = 'async';
+        image.src = `${dir}/${String(step).padStart(2, '0')}.webp`;
+        return image;
+      });
+      return;
+    }
+
     const video = videoRef.current;
     if (video && !video.src) video.src = src;
   }, [src]);
@@ -90,6 +113,31 @@ export function CreateVineReveal({
 
     /** 리빌이 어떻게 끝나든(정상·실패·시간초과) 여기로 모인다. */
     const submit = () => form.submit();
+
+    /*
+     * 이미지 시퀀스 경로 — 계단마다 그림을 갈아 끼운다. seek 가 없으니
+     * 기기와 무관하게 정확히 같은 계단이 나온다.
+     */
+    const playSequence = (images: HTMLImageElement[]) => {
+      const start = performance.now();
+      let shown = -1;
+
+      const tick = (now: number) => {
+        const t = Math.min((now - start) / MY_VINE_REVEAL.durationMs, 1);
+        const step = Math.min(
+          Math.floor(t * MY_VINE_REVEAL.steps),
+          images.length - 1,
+        );
+        if (step !== shown) {
+          shown = step;
+          video.poster = images[step].src;
+        }
+        if (t < 1) frameRef.current = requestAnimationFrame(tick);
+        else submit();
+      };
+
+      frameRef.current = requestAnimationFrame(tick);
+    };
 
     const play = () => {
       const duration = video.duration;
@@ -125,6 +173,13 @@ export function CreateVineReveal({
      * 영상이 준비되면 시작한다. 안 되면 기다리지 않고 넘어간다 —
      * 장식 때문에 판 만들기가 막히면 안 된다.
      */
+    // 모바일 — 영상을 안 받았다. 이미지로 간다.
+    const sequence = framesRef.current;
+    if (sequence) {
+      playSequence(sequence);
+      return;
+    }
+
     if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
       play();
       return;

@@ -7,6 +7,7 @@ export {
 export { PAGE_CAPACITY, SLOT_LAYOUT, type SlotLayout } from './slot-layout';
 export {
   GRAPE_DROP,
+  IMAGE_SEQUENCE,
   MAIN_CUES,
   MAIN_SCENE,
   MY_VINE_REVEAL,

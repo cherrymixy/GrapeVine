@@ -3,7 +3,7 @@ import { Screen } from '@/components/screen';
 import { ScrollProgress } from '@/components/scroll-progress';
 import { REVEAL_CLASS, revealStyle } from '@/components/reveal';
 import { ScrollScene } from '@/components/scroll-scene';
-import { ScrubVideo } from '@/components/scrub-video';
+import { ScrubBackdrop } from '@/components/scrub-backdrop';
 import { Sidebar } from '@/components/sidebar';
 import { MAIN_CUES, MAIN_SCENE, copy } from '@/data';
 
@@ -53,7 +53,7 @@ export default function MainPage() {
           포스터로 마지막 프레임을 쓰면 로드 직후 완성된 넝쿨이 빈 화면으로
           튄다.
         */}
-        <ScrubVideo src="/video/main.mp4" poster="/images/main_0.png" />
+        <ScrubBackdrop src="/video/main.mp4" poster="/images/main_0.png" />
 
         {/* 후반부에 하나씩 (PRD §5.1). 구간은 GRAPES 순서와 짝지어진다. */}
         <DecorGrapes grapes={GRAPES} reveal={MAIN_CUES.grapes} />
