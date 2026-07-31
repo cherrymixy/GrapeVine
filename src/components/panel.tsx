@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
 import styles from './panel.module.css';
 
@@ -10,11 +10,14 @@ import styles from './panel.module.css';
  */
 export function Panel({
   title,
+  titleTop,
   centered = false,
   testId,
   children,
 }: {
   title: string;
+  /** 원 위쪽에서 타이틀까지의 거리(rem). 화면마다 다르다. */
+  titleTop?: number;
   /** 화면 한가운데 절대배치할지 (Login·Sign Up). 모달은 딤이 가운데를 잡는다. */
   centered?: boolean;
   testId?: string;
@@ -24,6 +27,7 @@ export function Panel({
     <div
       className={`${styles.panel} ${centered ? styles.centered : ''}`}
       data-testid={testId}
+      style={titleTop === undefined ? undefined : ({ '--panel-title-top': `${titleTop}rem` } as CSSProperties)}
     >
       <h1 className={styles.title}>{title}</h1>
       {children}

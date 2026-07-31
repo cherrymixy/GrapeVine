@@ -1,0 +1,25 @@
+/*
+ * 딤 오버레이 + 원형 패널 (Figma 201:809 Rectangle 26 + 201:810 Ellipse 5031).
+ *
+ * 모달 4종이 같은 뼈대를 쓴다. 열림/닫힘은 URL 이 갖는다 —
+ * 딤 자체가 닫기 링크라 바깥을 누르면 닫힌다.
+ */
+
+.modal {
+  position: fixed;
+  z-index: 1;
+  display: grid;
+  inset: 0;
+  place-items: center;
+}
+
+/* 딤. 화면 전체를 덮고 누르면 닫힌다. */
+.dim {
+  position: absolute;
+  inset: 0;
+  background: var(--overlay-dim);
+}
+
+.panel {
+  position: relative;
+}

@@ -1,0 +1,26 @@
+/*
+ * Copy 버튼 (Figma 201:814).
+ * 입력 필드와 같은 높이의 마젠타 블록. 각지고 보더가 없다.
+ */
+
+.copy {
+  box-sizing: border-box;
+  width: 4.5rem; /* 201:814 width 72 */
+  height: var(--field-height);
+  padding: var(--field-padding);
+  border: 0;
+  border-radius: var(--radius-field);
+  background: var(--brand);
+  color: var(--text-on-brand);
+  font: inherit;
+  font-size: var(--font-size-body);
+  line-height: 1;
+}
+
+/*
+ * 복사 결과를 드러낸다. 클립보드 API 는 보안 컨텍스트에서만 동작하므로
+ * 실패를 성공처럼 보이면 안 된다 — 링크를 못 받은 걸 모르고 넘어간다.
+ */
+.copy[data-state='failed'] {
+  opacity: var(--dim-opacity);
+}

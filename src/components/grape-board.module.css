@@ -1,0 +1,46 @@
+/*
+ * 포도판 — Figma 201:753 / 201:871 / 201:777.
+ *
+ * 알은 화면 전체에 흩어진다. 판을 감싸는 별도 상자가 없고 프레임 자체가
+ * 판이다. 좌표는 data/slot-layout.ts 에서만 온다 (절대규칙 5).
+ *
+ * ⚠️ 배경 사진이 `object-fit: cover` 로 잘리므로, 뷰포트 종횡비가 원본
+ *    1536:771 에서 멀어지면 알과 넝쿨의 관계가 조금씩 어긋난다.
+ *    모바일 대응은 STEP 19 소관.
+ */
+
+.board {
+  position: absolute;
+  z-index: -1; /* 사이드바·페이지네이션보다 뒤 */
+  inset: 0;
+}
+
+.slot {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--size);
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-pill);
+  transform: translate(-50%, -50%);
+}
+
+.filled {
+  background: var(--grape-filled);
+}
+
+/*
+ * ⏸ 빈 알에는 아직 시안이 없다. Figma 의 어느 판도 빈 슬롯을 그리지 않는다
+ *    (Other's Vine 201:777 은 채운 알만 있고 나머지는 배경 그대로).
+ *    PRD §5.5 는 "빈 알 = 아웃라인/저채도"라고 하므로 값이 정해지면 채운다.
+ *    지금은 자리만 잡고 그리지 않는다 — 임의의 모양을 넣으면 틀린 시안이
+ *    화면에 남는다.
+ */
+.empty {
+  background: none;
+}
+
+/* 채운 알은 눌러서 열람한다 (My Vine·Other's Vine 공통). */
+a.slot {
+  display: block;
+}

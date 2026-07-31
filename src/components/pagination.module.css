@@ -1,0 +1,21 @@
+/*
+ * 좌상단 `1/2 >` (Figma 201:867 / 201:869).
+ *
+ * 페이지 패딩과 같은 자리에서 시작하므로 흐름의 첫 요소다.
+ * 뒤로가기 `<` 와 같은 display 크기이고 색만 --text-sub 다.
+ */
+
+.pagination {
+  display: flex;
+  align-items: baseline;
+  /* 201:869 left 167 - (43 + 86) = 38 */
+  gap: 2.375rem;
+  color: var(--text-sub);
+  font-size: var(--font-size-display);
+  line-height: var(--line-height-display);
+}
+
+.next {
+  color: inherit;
+  text-decoration: none;
+}

@@ -1,0 +1,46 @@
+/*
+ * 큰 사각 CTA (Figma 201:751 Create My Vine / 201:789 Add Grape /
+ * 201:898 Here is Full!).
+ *
+ * pill 과 달리 각지고 보더가 없다. 채움과 반전 두 가지로 쓰인다.
+ */
+
+.cta {
+  display: flex;
+  box-sizing: border-box;
+  width: var(--cta-width);
+  align-items: center;
+  justify-content: center;
+  padding: var(--cta-padding);
+  border: 0;
+  border-radius: var(--radius-field);
+  font: inherit;
+  font-size: var(--font-size-cta);
+  line-height: 1;
+  text-align: center;
+  text-decoration: none;
+}
+
+/* 201:751 — 마젠타 바탕 (Create My Vine) */
+.filled {
+  background: var(--brand);
+  color: var(--text-on-brand);
+}
+
+/* 201:789 / 201:898 — 밝은 바탕에 마젠타 글자 (Add Grape / Here is Full!) */
+.inverted {
+  background: var(--text-sub);
+  color: var(--brand);
+}
+
+.cta:disabled {
+  cursor: default;
+}
+
+/* 화면 한가운데 놓이는 형태 (My Vine 빈 상태 — 201:751). */
+.centered {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

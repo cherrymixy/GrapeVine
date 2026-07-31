@@ -1,0 +1,78 @@
+/*
+ * My Vine — Figma 201:749(빈 상태) / 201:753(판) / 201:791(Share) /
+ * 201:823(Setting) / 201:979(See Grape).
+ *
+ * 판 자체는 GrapeBoard, 셸은 Screen/Sidebar/Pagination 이 그린다.
+ * 여기에는 모달 안쪽 배치만 둔다.
+ */
+
+.error {
+  margin: 0.5rem 0 0;
+  font-size: var(--font-size-fine);
+}
+
+/* --- Share My Vine (201:812 + 201:814) --- */
+
+.shareRow {
+  display: flex;
+  /* 201:812 top 406 — 타이틀(292 + 49) 아래 65 */
+  margin-top: 4.0625rem;
+  gap: 0.5rem; /* 916 - (548 + 360) */
+}
+
+.shareUrl {
+  box-sizing: border-box;
+  width: 22.5rem; /* 201:812 width 360 */
+  height: var(--field-height);
+  padding: var(--field-padding);
+  border: var(--border-width-field) solid currentColor;
+  border-radius: var(--radius-field);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: var(--font-size-body);
+}
+
+/* --- Setting (201:851~201:865) --- */
+
+.settingList {
+  /* 201:851 top 317 — 타이틀(223 + 49) 아래 45 */
+  margin: 2.8125rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.settingRow {
+  display: flex;
+  box-sizing: border-box;
+  width: 22.5rem; /* 360 */
+  height: var(--field-height);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--field-padding);
+  font-size: var(--font-size-body);
+}
+
+.settingLink {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  color: inherit;
+  text-decoration: none;
+}
+
+/* 미정 4행은 확정 전까지 비활성 (PRD §5.7). */
+.settingPending {
+  opacity: var(--dim-opacity);
+}
+
+/* --- See Grape (201:1023) --- */
+
+.grapeMessage {
+  /* 201:1023 top 305 — 타이틀(223 + 49) 아래 33 */
+  width: 22.5rem;
+  margin: 2.0625rem 0 0;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body-tight);
+  text-align: center;
+}

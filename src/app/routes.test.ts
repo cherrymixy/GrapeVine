@@ -109,9 +109,10 @@ describe.skipIf(!hasCredentials)('라우트 (실서버)', () => {
     const myResponse = await fetch(`${BASE}/my`, { redirect: 'manual', headers: { cookie } });
 
     expect(myResponse.status).toBe(200);
-    // 로그인 상태에서만 나오는 사이드바 변형이 세션이 살아 있다는 증거다.
-    // (빈 상태 화면에는 displayName 이 없다 — PRD §5.5 는 버튼 하나만 둔다.)
-    await expect(myResponse.text()).resolves.toContain('data-variant="owner"');
+    // 판이 없는 로그인 사용자에게만 나오는 버튼이 세션이 살아 있다는 증거다.
+    // (Figma 201:749 의 빈 상태에는 사이드바도 displayName 도 없다 —
+    //  PRD §5.5 대로 버튼 하나뿐이다.)
+    await expect(myResponse.text()).resolves.toContain('data-testid="create-vine"');
   });
 
   it('/v/[slug] 는 세션과 무관하게 항상 공개다', async () => {
