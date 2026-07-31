@@ -16,6 +16,7 @@ export function GrapeBoard({
   view,
   slotHref,
   dropSlot = null,
+  showEmpty = true,
 }: {
   view: PageView;
   /** 채워진 알을 눌렀을 때 갈 곳. 없으면 읽기 전용. */
@@ -25,6 +26,14 @@ export function GrapeBoard({
    * 서버가 `?dropped=` 로 알려 준다 — 어느 슬롯이 배정됐는지는 서버만 안다.
    */
   dropSlot?: number | null;
+  /**
+   * 빈 알을 그릴지 (STEP 23, 승아님 지시).
+   *
+   * 주인 화면에서는 그리지 않는다 — 자기 판의 빈자리를 세는 것은 이 서비스가
+   * 하려는 일이 아니다(§9 "판 상태 = 채운 수만"). 방문자 화면은 어디에 붙일지
+   * 보여야 하므로 그대로 그린다.
+   */
+  showEmpty?: boolean;
 }) {
   return (
     /*
@@ -41,6 +50,7 @@ export function GrapeBoard({
         if (!layout) return null;
 
         const filled = slot.grape !== null;
+        if (!filled && !showEmpty) return null;
         // 빈 칸이 떨어질 일은 없다. `?dropped=` 가 조작돼도 마찬가지다.
         const dropping = filled && slot.slotIndex === dropSlot;
         const className = [styles.slot, filled ? styles.filled : styles.empty, dropping ? styles.dropping : '']

@@ -28,3 +28,25 @@
 .copy:hover {
   filter: brightness(0.94);
 }
+
+/*
+ * 복사 결과 문구 (STEP 23).
+ *
+ * 입력칸 + 버튼 줄 **아래**에 놓인다. 줄 안에 끼우면 버튼이 밀려 시안이 깨진다.
+ * `.shareRow` 가 flex 라 폭 전체를 차지하게 두면 줄바꿈되어 아래로 간다.
+ *
+ * ⚠️ Figma 에 시안이 없다. 새 색을 만들지 않고 가장 작은 글자 단계에 그 화면의
+ *    잉크를 그대로 쓴다.
+ */
+.result {
+  width: 100%;
+  margin: 0.5rem 0 0;
+  font-size: var(--font-size-fine);
+  line-height: var(--line-height-body);
+  text-align: center;
+}
+
+/* 실패는 눈에 띄어야 한다 — 링크를 못 받은 걸 모르고 넘어가면 안 된다. */
+.copy[data-state='failed'] ~ .result {
+  color: var(--brand);
+}

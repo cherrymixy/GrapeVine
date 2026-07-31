@@ -107,6 +107,13 @@ export const copy = {
 
   /** Share My Vine 모달 — PRD §5.6 */
   share: {
+    /*
+     * 복사 결과 (STEP 23, 승아님 지시).
+     * 눌렀는데 아무 말이 없으면 됐는지 알 수 없다 — 이 링크가 이 서비스의
+     * 전부라 더더욱 확인이 필요하다.
+     */
+    copied: 'Copied!',
+    copyFailed: 'Could not copy. Select the link and copy it.',
     title: 'Share My Vine',
     copy: 'Copy',
   },
@@ -115,9 +122,64 @@ export const copy = {
   setting: {
     title: 'Setting',
     myAccount: 'My Account',
-    /** 미정 4행. PRD §5.7 이 `...` 로 지정했고 확정 전까지 비활성이다. */
-    pending: '...',
-    pendingCount: 4,
+
+    /*
+     * 설정 항목 (STEP 23).
+     *
+     * 전에는 `...` 네 줄이 비활성으로 놓여 있었다 — PRD §5.7 이 "미정 4행"
+     * 이라고만 해서 자리만 잡아 뒀다. 실제 내용을 채웠다.
+     *
+     * ⚠️ 아래 문서는 **이 앱이 실제로 하는 일**만 적었다. 안 하는 일을 적으면
+     *    (광고·제3자 제공·추적 같은 것) 사실이 아닌 약관이 된다.
+     *    법률 검토를 받은 문서가 아니다 — 배포 전에 확인이 필요하면 승아님이
+     *    이 문구를 교체하면 된다.
+     */
+    privacy: 'Privacy Policy',
+    terms: 'Terms of Service',
+    openSource: 'Open Source',
+    logOutRow: 'Log Out',
+  },
+
+  /** Setting 안쪽 문서 (STEP 23). 전부 영문 — 이 서비스의 UI 언어다. */
+  documents: {
+    privacy: {
+      title: 'Privacy Policy',
+      body: [
+        'What we keep',
+        'Your login ID, a password (stored hashed by our authentication provider, never in plain text), and the display name your friends see.',
+        'The compliments left on your vine, and the name each writer typed. If a writer chooses Unknown, no name is stored — the field is discarded on the server, not just hidden.',
+        'What we do not keep',
+        'No email address, phone number, or real name. No analytics, no advertising, no third-party trackers. We do not sell or share anything.',
+        'Who can see your vine',
+        'Anyone holding the link. The link is a random 10-character address that is not listed anywhere and is excluded from search engines, but it is not a secret — treat it like a shared photo.',
+        'Deleting',
+        'Deleting your account removes your vine, its pages, and every compliment on it in the same operation.',
+      ],
+    },
+    terms: {
+      title: 'Terms of Service',
+      body: [
+        'What this is',
+        'GRAPEVINE is a place to collect compliments. One click creates a board of 15 grapes; anyone with your link can attach one compliment to an empty grape without signing in.',
+        'The rules',
+        'One vine per account. A compliment is at most 80 characters. Visitors can only add — nothing can be edited or deleted once attached, by the writer or by you. You cannot write on your own vine.',
+        'Behave',
+        'Write things you would be glad to have read aloud. Do not use the compliment field for harassment, advertising, or anything unlawful.',
+        'No promises',
+        'This is a personal project offered as-is, with no guarantee that it stays online or that your data survives. Keep anything you want to keep somewhere else too.',
+      ],
+    },
+    openSource: {
+      title: 'Open Source',
+      body: [
+        'Built with',
+        'Next.js (App Router) · React · TypeScript · Supabase (Postgres) · Lenis · Vitest. Each is used under its own license.',
+        'Type',
+        'Kode Mono for Latin, IBM Plex Sans KR for Korean. Both are licensed under the SIL Open Font License 1.1.',
+        'The source',
+        'github.com/cherrymixy/GrapeVine',
+      ],
+    },
   },
 
   /** 공통 셸 — PRD §5.0 */

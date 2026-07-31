@@ -6,6 +6,14 @@
  */
 
 .back {
+  /*
+   * ⚠️ 딤 위에 있어야 한다 (STEP 23).
+   *
+   * 모달이 열리면 딤(`z-index: 1`)이 화면 전체를 덮는다. 그 아래 있으면
+   * 흐릿하게 **비활성처럼 보이고**, 눌러도 딤이 가로챈다. 실제로 그랬다.
+   */
+  position: relative;
+  z-index: 2;
   display: inline-block;
   color: inherit;
   font-size: var(--font-size-display);

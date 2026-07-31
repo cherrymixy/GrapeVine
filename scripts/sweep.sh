@@ -80,11 +80,24 @@ hasnt "모달 열리면 페이지네이션 숨김" "$SHARE" 'data-testid="pagina
 echo "── 7. Setting / My Account / 로그아웃"
 SET=$(curl -s "$B/my?modal=setting" -H "cookie: $COOKIE")
 has "Setting 모달" "$SET" 'data-testid="setting-modal"'
-chk "미정 4행" "$(echo "$SET" | grep -o 'data-testid="setting-pending"' | wc -l | tr -d ' ')" "4"
+# 전에는 `...` 네 줄이 비활성으로 놓여 있었다. 이제 실제 문서가 들어간다.
+has "  개인정보 처리방침 줄" "$SET" 'Privacy Policy'
+has "  이용약관 줄" "$SET" 'Terms of Service'
+has "  오픈소스 줄" "$SET" 'Open Source'
+hasnt "  미정 자리표시자 없음" "$SET" 'setting-pending'
+# 로그아웃은 My Account 안이 아니라 설정 목록에 있다 (STEP 23).
+has "  로그아웃 버튼" "$SET" 'data-testid="logout"'
+# 설정 안쪽 문서는 원 안에서 스크롤한다.
+TERMS=$(curl -s "$B/my?modal=terms" -H "cookie: $COOKIE")
+has "  약관 문서가 열린다" "$TERMS" 'data-testid="document"'
+# 설정 안쪽에서 뒤로가기는 판이 아니라 **설정으로** 돌아가야 한다.
+has "  문서 뒤로가기 → 설정" "$TERMS" 'modal=setting'
+# 주인 화면에는 빈 알을 그리지 않는다 (STEP 23).
+hasnt "  주인 판에 빈 알 없음" "$(curl -s "$B/my" -H "cookie: $COOKIE")" 'data-filled="false"'
+has "  방문자 판에는 빈 알 있음" "$(curl -s "$B/v/$SLUG")" 'data-filled="false"' 
 ACC=$(curl -s "$B/my?modal=account" -H "cookie: $COOKIE")
 has "My Account 모달 (죽은 링크 아님)" "$ACC" 'data-testid="account-modal"'
 has "  아이디 표시" "$ACC" "$L"
-has "  로그아웃 버튼" "$ACC" 'data-testid="logout"'
 
 echo "── 8. 방문자 (미로그인)"
 V=$(curl -s "$B/v/$SLUG")

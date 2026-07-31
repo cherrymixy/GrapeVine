@@ -103,15 +103,38 @@ export default async function MyVinePage({ searchParams }: { searchParams: Promi
       ? (view.slots.find((slot) => slot.slotIndex === openedSlot)?.grape ?? null)
       : null;
 
+  /*
+   * 열린 모달과 그 **닫는 곳**을 한 군데서 정한다 (STEP 23).
+   *
+   * 전에는 딤은 `closeHref` 로, 좌상단 뒤로가기는 늘 `base` 로 갔다 —
+   * My Account 에서 뒤로가기를 누르면 Setting 이 아니라 판까지 나가 버렸다.
+   * 둘이 같은 값을 봐야 어긋나지 않는다.
+   */
+  const SETTING_PAGES = ['account', 'privacy', 'terms', 'openSource'] as const;
+  type SettingPage = (typeof SETTING_PAGES)[number];
+  const settingPage = SETTING_PAGES.find((name) => name === search.modal) ?? null;
+
+  const openModal = openedGrape !== null ? 'grape' : (search.modal ?? null);
   const modalOpen =
-    openedGrape !== null || ['share', 'setting', 'account'].includes(search.modal ?? '');
+    openedGrape !== null || ['share', 'setting', ...SETTING_PAGES].includes(search.modal ?? '');
+  /** 설정 안쪽 문서는 설정으로, 나머지는 판으로 돌아간다. */
+  const closeHref = settingPage ? `${base}&modal=setting` : base;
 
   return (
     <Screen background="/images/myvine_2.png" tone="dark" priority>
       {/* 시안에는 제목 글자가 없다(201:753). 보이지 않게만 넣는다. */}
       <h1 className="srOnly">{copy.nav.myVine}</h1>
 
-      <GrapeBoard view={view} slotHref={(slotIndex) => `${base}&grape=${slotIndex}`} />
+      {/*
+        주인 화면은 빈 알을 그리지 않는다 (승아님 지시). 자기 판의 빈자리를
+        세는 건 이 서비스가 하려는 일이 아니다 (§9 "판 상태 = 채운 수만").
+        방문자 화면은 어디에 붙일지 보여야 하므로 그대로 그린다.
+      */}
+      <GrapeBoard
+        view={view}
+        slotHref={(slotIndex) => `${base}&grape=${slotIndex}`}
+        showEmpty={false}
+      />
       <Sidebar variant="owner" current="/my" />
 
       {/*
@@ -120,7 +143,7 @@ export default async function MyVinePage({ searchParams }: { searchParams: Promi
         모달을 닫는 길이 딤 말고도 하나 더 있어야 한다.
       */}
       {modalOpen ? (
-        <BackLink href={base} />
+        <BackLink href={closeHref} />
       ) : (
         <Pagination
           pageIndex={view.pageIndex}
@@ -136,7 +159,7 @@ export default async function MyVinePage({ searchParams }: { searchParams: Promi
       ) : null}
 
       {search.modal === 'share' ? (
-        <Modal title={copy.share.title} label={copy.share.title} titleTop={10.5} closeHref={base} testId="share-modal">
+        <Modal title={copy.share.title} label={copy.share.title} titleTop={10.5} closeHref={closeHref} testId="share-modal">
           <div className={styles.shareRow}>
             <input
               className={styles.shareUrl}
@@ -151,26 +174,30 @@ export default async function MyVinePage({ searchParams }: { searchParams: Promi
       ) : null}
 
       {search.modal === 'setting' ? (
-        <Modal title={copy.setting.title} label={copy.setting.title} titleTop={6.1875} closeHref={base} testId="setting-modal">
+        <Modal title={copy.setting.title} label={copy.setting.title} titleTop={6.1875} closeHref={closeHref} testId="setting-modal">
           <ul className={styles.settingList}>
-            <li className={styles.settingRow}>
-              <a className={styles.settingLink} href={`${base}&modal=account`}>
-                <span>{copy.setting.myAccount}</span>
-                <span>{copy.shell.nextPage}</span>
-              </a>
-            </li>
-            {/* PRD §5.7 — 미정 4행. 확정 전까지 비활성. */}
-            {Array.from({ length: copy.setting.pendingCount }, (_, index) => (
-              <li
-                key={index}
-                className={`${styles.settingRow} ${styles.settingPending}`}
-                aria-disabled="true"
-                data-testid="setting-pending"
-              >
-                <span>{copy.setting.pending}</span>
-                <span>{copy.shell.nextPage}</span>
+            {[
+              { key: 'account', label: copy.setting.myAccount },
+              { key: 'privacy', label: copy.setting.privacy },
+              { key: 'terms', label: copy.setting.terms },
+              { key: 'openSource', label: copy.setting.openSource },
+            ].map((row) => (
+              <li key={row.key} className={styles.settingRow}>
+                <a className={styles.settingLink} href={`${base}&modal=${row.key}`}>
+                  <span>{row.label}</span>
+                  <span>{copy.shell.nextPage}</span>
+                </a>
               </li>
             ))}
+            {/* 로그아웃은 이동이 아니라 동작이라 링크가 아니다. */}
+            <li className={styles.settingRow}>
+              <form method="post" action="/api/auth/logout">
+                <button className={styles.settingLink} type="submit" data-testid="logout">
+                  <span>{copy.setting.logOutRow}</span>
+                  <span aria-hidden="true" />
+                </button>
+              </form>
+            </li>
           </ul>
         </Modal>
       ) : null}
@@ -187,7 +214,7 @@ export default async function MyVinePage({ searchParams }: { searchParams: Promi
           title={copy.setting.myAccount}
           label={copy.setting.myAccount}
           titleTop={6.1875}
-          closeHref={`${base}&modal=setting`}
+          closeHref={closeHref}
           testId="account-modal"
         >
           <dl className={styles.account}>
@@ -196,11 +223,34 @@ export default async function MyVinePage({ searchParams }: { searchParams: Promi
             <dt>{copy.auth.displayNameLabel}</dt>
             <dd data-testid="account-display-name">{user.displayName}</dd>
           </dl>
-          <form method="post" action="/api/auth/logout">
-            <button className={styles.logout} type="submit" data-testid="logout">
-              {copy.auth.logOut}
-            </button>
-          </form>
+        </Modal>
+      ) : null}
+
+      {/*
+        설정 안쪽 문서 (STEP 23). 전에는 `...` 네 줄이 비활성으로 놓여 있었다.
+        홀수 줄이 소제목, 짝수 줄이 본문이다 — 문구는 전부 `data/copy.ts`.
+      */}
+      {settingPage && settingPage !== 'account' ? (
+        <Modal
+          title={copy.documents[settingPage].title}
+          label={copy.documents[settingPage].title}
+          titleTop={4.5}
+          closeHref={closeHref}
+          testId={`${settingPage}-modal`}
+        >
+          <div className={styles.document} data-testid="document">
+            {copy.documents[settingPage].body.map((line, index) =>
+              index % 2 === 0 ? (
+                <h3 key={line} className={styles.documentHeading}>
+                  {line}
+                </h3>
+              ) : (
+                <p key={line} className={styles.documentBody}>
+                  {line}
+                </p>
+              ),
+            )}
+          </div>
         </Modal>
       ) : null}
 
@@ -209,7 +259,7 @@ export default async function MyVinePage({ searchParams }: { searchParams: Promi
           title={openedGrape.isAnonymous ? copy.seeGrape.anonymousAuthor : openedGrape.authorName!}
           label={openedGrape.isAnonymous ? copy.seeGrape.anonymousAuthor : openedGrape.authorName!}
           titleTop={6.1875}
-          closeHref={base}
+          closeHref={closeHref}
           testId="see-grape-modal"
         >
           <p className={styles.grapeMessage} data-testid="grape-message">

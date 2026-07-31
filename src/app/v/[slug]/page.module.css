@@ -27,8 +27,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* 201:925 top 378 — 타이틀(215 + 98) 아래 65 */
-  margin-top: 4.0625rem;
+  /*
+   * ⚠️ 시안(201:925)은 타이틀 아래 65 지만 그대로 두면 **이름 칸과 Send 가
+   *    원 밖으로 나간다** (승아님 지적). 원은 지름이 고정인데 그 안에
+   *    입력 2개 + 라디오 + 버튼이 세로로 쌓이기 때문이다.
+   *    시안 간격을 절반 조금 넘게 줄여 넷 다 원 안에 들어오게 했다.
+   */
+  margin-top: 2.25rem;
 }
 
 .message {
@@ -122,11 +127,25 @@
 /* --- See Grape (201:1023) --- */
 
 .grapeMessage {
+  /*
+   * 원 안에 머문다 (STEP 23, 승아님 지시).
+   *
+   * 긴 칭찬(최대 80자)이 원 아래로 흘러나가면 딤 위에 글자만 떠 있게 된다.
+   * 높이를 원의 남는 자리로 묶고, 넘치면 그 안에서 스크롤한다.
+   *
+   * ⚠️ 높이는 패널 지름 대비 비율이다 — 패널이 `min(523px, 92vw)` 로 줄어드는
+   *    세로 화면에서도 같은 비율로 따라간다.
+   */
+  overflow-y: auto;
   width: 22.5rem;
+  max-height: calc(var(--panel-size) * 0.42);
   margin: 2.0625rem 0 0;
   font-size: var(--font-size-body);
   line-height: var(--line-height-body-tight);
+  overscroll-behavior: contain;
   text-align: center;
+  /* 긴 낱말 하나가 원 밖으로 삐져나가지 않게. */
+  overflow-wrap: anywhere;
 }
 
 /*

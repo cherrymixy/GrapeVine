@@ -17,6 +17,8 @@
   display: flex;
   /* 201:812 top 406 — 타이틀(292 + 49) 아래 65 */
   margin-top: 4.0625rem;
+  /* 복사 결과 문구가 줄바꿈돼 아래로 가게 (STEP 23). */
+  flex-wrap: wrap;
   gap: 0.5rem; /* 916 - (548 + 360) */
 }
 
@@ -99,12 +101,25 @@
 /* --- See Grape (201:1023) --- */
 
 .grapeMessage {
-  /* 201:1023 top 305 — 타이틀(223 + 49) 아래 33 */
+  /*
+   * 원 안에 머문다 (STEP 23, 승아님 지시).
+   *
+   * 긴 칭찬(최대 80자)이 원 아래로 흘러나가면 딤 위에 글자만 떠 있게 된다.
+   * 높이를 원의 남는 자리로 묶고, 넘치면 그 안에서 스크롤한다.
+   *
+   * ⚠️ 높이는 패널 지름 대비 비율이다 — 패널이 `min(523px, 92vw)` 로 줄어드는
+   *    세로 화면에서도 같은 비율로 따라간다.
+   */
+  overflow-y: auto;
   width: 22.5rem;
+  max-height: calc(var(--panel-size) * 0.42);
   margin: 2.0625rem 0 0;
   font-size: var(--font-size-body);
   line-height: var(--line-height-body-tight);
+  overscroll-behavior: contain;
   text-align: center;
+  /* 긴 낱말 하나가 원 밖으로 삐져나가지 않게. */
+  overflow-wrap: anywhere;
 }
 
 /*
@@ -125,4 +140,49 @@
     min-width: 0; /* flex 안에서 줄어들 수 있게 — 안 그러면 Copy 버튼을 민다 */
     flex: 1;
   }
+}
+
+/*
+ * 설정 안쪽 문서 (STEP 23).
+ *
+ * 약관·정책은 길다. 원 안에서 스크롤하게 두고, 원을 넘지 않게 높이를 묶는다.
+ * ⚠️ Figma 에 시안이 없다. 새 색·크기를 만들지 않고 이미 있는 것만 쓴다 —
+ *    소제목은 본문 크기에 굵기 그대로, 본문은 가장 작은 단계.
+ */
+.document {
+  overflow-y: auto;
+  width: 20rem;
+  max-height: calc(var(--panel-size) * 0.46);
+  margin-top: 1.5rem;
+  overscroll-behavior: contain;
+  text-align: left;
+}
+
+.documentHeading {
+  margin: 1.125rem 0 0.25rem;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight);
+  line-height: var(--line-height-body-tight);
+}
+
+.documentHeading:first-child {
+  margin-top: 0;
+}
+
+.documentBody {
+  margin: 0;
+  /* 모달의 주 내용이라 흐리게 하지 않는다. 크기만 한 단계 작다. */
+  font-size: var(--font-size-fine);
+  line-height: var(--line-height-body);
+  overflow-wrap: anywhere;
+}
+
+/* 설정 목록의 로그아웃은 버튼이지만 다른 줄과 똑같이 보여야 한다. */
+.settingList button.settingLink {
+  width: 100%;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
 }

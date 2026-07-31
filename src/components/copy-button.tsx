@@ -18,16 +18,28 @@ export function CopyButton({ value }: { value: string }) {
   const [state, setState] = useState<'idle' | 'copied' | 'failed'>('idle');
 
   return (
-    <button
-      className={styles.copy}
-      type="button"
-      data-testid="copy"
-      data-state={state}
-      onClick={async () => {
-        setState((await copyToClipboard(value)) ? 'copied' : 'failed');
-      }}
-    >
-      {copy.share.copy}
-    </button>
+    <>
+      <button
+        className={styles.copy}
+        type="button"
+        data-testid="copy"
+        data-state={state}
+        onClick={async () => {
+          setState((await copyToClipboard(value)) ? 'copied' : 'failed');
+        }}
+      >
+        {copy.share.copy}
+      </button>
+
+      {/*
+        결과를 말해 준다 (STEP 23). `role="status"` 라 스크린리더도 읽는다 —
+        버튼 모양만 바뀌면 눈으로 보는 사람만 알 수 있다.
+      */}
+      {state === 'idle' ? null : (
+        <p className={styles.result} role="status" data-testid="copy-result">
+          {state === 'copied' ? copy.share.copied : copy.share.copyFailed}
+        </p>
+      )}
+    </>
   );
 }
