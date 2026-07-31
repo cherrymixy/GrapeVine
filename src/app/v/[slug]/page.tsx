@@ -121,8 +121,13 @@ export default async function OthersVinePage({
             </label>
 
             {/*
-              ⚠️ 이름 입력은 Figma 201:904 에 없다. 기명으로 붙이려면 이름이
-                 필요해서(PRD §7-6) 넣어 뒀다 — 시안 확인이 필요하다.
+              PRD §5.10 "익명 미선택 시 이름 입력 필요".
+              Unknown 을 켜면 CSS 가 이 칸을 숨긴다 — 익명이면 받을 이유가 없다.
+              Figma 201:904 에 안 보이는 건 그 프레임이 Unknown 켜진 상태라서다.
+
+              `required` 를 걸지 않는다. 숨겨진 채로 required 면 브라우저가
+              전송을 막으면서 포커스할 곳이 없어 아무 안내도 못 준다.
+              이름 누락은 서버가 InvalidAuthorNameError 로 거른다.
             */}
             <input
               className={styles.authorName}
