@@ -30,6 +30,9 @@ type GrapeRow = {
   created_at: string;
 };
 
+/** `create_vine` RPC 의 반환 형태 (jsonb). */
+type CreateVineResult = { vine: VineRow; page: VinePageRow };
+
 const toVine = (row: VineRow): Vine => ({
   id: row.id,
   ownerId: row.owner_id,
@@ -83,14 +86,21 @@ export class SupabaseVineRepository implements VineRepository {
     private readonly slugFactory: () => string = generateSlug,
   ) {}
 
+  /**
+   * Vine + Page 1 을 **한 트랜잭션에서** 만든다 (PRD §7-1).
+   *
+   * 두 삽입을 애플리케이션에서 나누면 페이지 삽입 실패 시 "페이지 없는 판"이
+   * 남고, `UNIQUE(vines.owner_id)` 때문에 재생성으로도 복구되지 않는다.
+   * 그래서 `create_vine` RPC 안에서 처리한다 — plpgsql 본문은 호출 문장 하나라
+   * 두 번째 삽입이 실패하면 첫 번째도 함께 롤백된다.
+   */
   async createVine(ownerId: string): Promise<CreatedVine> {
-    const vine = await withUniqueSlug(
+    return withUniqueSlug(
       async (slug) => {
-        const { data, error } = await this.client
-          .from('vines')
-          .insert({ owner_id: ownerId, slug })
-          .select()
-          .single<VineRow>();
+        const { data, error } = await this.client.rpc('create_vine', {
+          p_owner_id: ownerId,
+          p_slug: slug,
+        });
 
         if (error) {
           const constraint = constraintName(error);
@@ -98,31 +108,21 @@ export class SupabaseVineRepository implements VineRepository {
           if (constraint === 'vines_owner_id_key') {
             throw new OwnerAlreadyHasVineError(ownerId, { cause: error });
           }
-          throw new RepositoryFailureError('createVine/insertVine', { cause: error });
+          throw new RepositoryFailureError('createVine', { cause: error });
         }
 
-        return toVine(data);
+        // RPC 는 jsonb 를 그대로 돌려주므로 클라이언트가 형태를 알 수 없다.
+        // 경계에서 한 번 확인해, 형태가 어긋나면 매핑 중 TypeError 가 아니라
+        // 도메인 에러로 드러나게 한다.
+        const result = data as CreateVineResult | null;
+        if (!result?.vine || !result?.page) {
+          throw new RepositoryFailureError('createVine/unexpected-rpc-shape');
+        }
+
+        return { vine: toVine(result.vine), firstPage: toVinePage(result.page) };
       },
       { generate: this.slugFactory },
     );
-
-    // ⚠️ vine 과 page 1 이 별도 문장이라 원자적이지 않다. page 삽입이 실패하면
-    //    "페이지 없는 판"이 남고, owner_id UNIQUE 때문에 재생성도 막힌다.
-    //    그래서 실패 시 vine 을 보상 삭제한다. STEP 5 에서 RPC 하나로 합칠 것.
-    try {
-      const { data, error } = await this.client
-        .from('vine_pages')
-        .insert({ vine_id: vine.id, page_index: 1 })
-        .select()
-        .single<VinePageRow>();
-
-      if (error) throw new RepositoryFailureError('createVine/insertFirstPage', { cause: error });
-
-      return { vine, firstPage: toVinePage(data) };
-    } catch (error) {
-      await this.client.from('vines').delete().eq('id', vine.id);
-      throw error;
-    }
   }
 
   async getVineBySlug(slug: string): Promise<Vine | null> {

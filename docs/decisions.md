@@ -75,3 +75,14 @@
 - **vitest 에 `server-only` alias 추가** — 이 패키지는 Next 번들러 밖에서 import 되면 throw 한다. no-op 으로 치환해야 서버 전용 모듈을 테스트에서 부를 수 있다.
 - **원격 테스트는 자격증명 없으면 스킵** — `describe.skipIf`. 단 **describe 본문은 스킵돼도 실행**되므로 클라이언트 생성을 `beforeAll` 로 늦춰야 한다. 본문에서 만들면 스킵이 아니라 수집 단계 실패가 된다(실제로 한 번 밟았다).
 - **테스트 뒷정리는 users 삭제 하나로** — FK cascade 로 vines → vine_pages → grapes 가 함께 지워진다.
+
+## STEP 3b — 지적한 문제 해결
+
+- **`createVine` 원자성 확보 — `create_vine` RPC** (`20260731010000`). plpgsql 함수 본문은 호출 문장 하나 안에서 실행되므로, `vine_pages` 삽입이 실패하면 `vines` 삽입도 함께 롤백된다. 보상 삭제를 걷어냈다 — 보상 삭제는 그 삭제 자체가 실패할 수 있어서 진짜 해결이 아니었다.
+  **실증:** `vine_pages` 에 반드시 실패하는 트리거를 주입하고 `create_vine` 을 호출한 뒤 vines 행 수를 셌다 → 0. 전부 트랜잭션 안에서 하고 롤백했다.
+- **슬러그는 여전히 TS 쪽에서 만든다** — RPC 는 주어진 슬러그로 점유만 시도하고, 충돌하면 `UNIQUE(vines.slug)` 위반을 그대로 올린다. 생성·재시도를 DB 로 내리면 `services/slug.ts` 가 백엔드에 묶여 경로 B 교체가 막힌다.
+- **RPC 는 `security invoker`** — `definer` 로 만들면 이 함수 자체가 RLS 를 우회하는 구멍이 된다. invoker 라서 anon 이 호출하면 내부 INSERT 가 RLS 에 걸린다.
+- ⚠️ **`revoke all ... from public` 은 Supabase 에서 듣지 않는다** (`20260731020000` 으로 수정). Supabase 는 `anon`/`authenticated` 에게 default privileges 로 EXECUTE 를 따로 부여하기 때문에 PUBLIC 에서 회수해도 두 역할은 그대로 남는다. **역할을 명시해 `revoke execute ... from anon, authenticated`** 해야 한다. 실측으로 잡았다 — 회수 전 anon 호출은 `42501 row-level security`(RLS 가 막음), 회수 후는 `42501 permission denied for function`(권한이 막음). 실제로 뚫린 적은 없지만 방어가 한 겹뿐이었다.
+- **적용된 마이그레이션은 수정하지 않고 새 파일로 고친다** — 파일을 고치면 이 DB(이미 적용됨)와 새로 만든 DB(수정본 적용)의 스키마가 갈라진다.
+- **`.rpc().returns<T>()` 는 스칼라 jsonb 반환에 쓸 수 없다** — supabase-js 가 배열 캐스팅으로 간주해 타입 에러를 낸다. 런타임은 정상이라 테스트만 돌리면 못 잡는다. 경계에서 `as` 캐스트 + 형태 확인으로 처리해, 형태가 어긋나면 매핑 중 TypeError 가 아니라 `RepositoryFailureError` 로 드러나게 했다.
+- **`withUniqueSlug` 재시도 경로 테스트 6개 추가** — 왕복 테스트에서는 슬러그가 충돌하지 않아 재시도 루프가 한 번도 실행되지 않았다. 순수 함수라 주입만으로 덮인다: 충돌 후 재시도 성공 / 예산 소진 시 `SlugExhaustedError` / 마지막 충돌을 `cause` 로 보존 / **충돌이 아닌 에러는 재시도 없이 즉시 재던짐** / 첫 시도 성공 시 1회만 호출.
