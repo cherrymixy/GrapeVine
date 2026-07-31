@@ -13,7 +13,20 @@
 
 <sub>데모 판은 로그인 없이 바로 한 알 붙일 수 있다.</sub>
 
-<sub>Next.js (App Router) · TypeScript · Supabase · CSS Modules · Lenis · Vitest</sub>
+<p>
+  <img src="https://img.shields.io/badge/Next.js-16.2-000000?logo=nextdotjs&logoColor=white" alt="Next.js 16.2" />
+  <img src="https://img.shields.io/badge/React-19.2-61DAFB?logo=react&logoColor=white" alt="React 19.2" />
+  <img src="https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white" alt="TypeScript 5.9" />
+  <img src="https://img.shields.io/badge/Supabase-Postgres%20%2B%20RLS-3FCF8E?logo=supabase&logoColor=white" alt="Supabase" />
+  <img src="https://img.shields.io/badge/Vitest-116%20passed-6E9F18?logo=vitest&logoColor=white" alt="Vitest 116 passed" />
+  <img src="https://img.shields.io/badge/version-v1.0-success" alt="version v1.0" />
+</p>
+<p>
+  <img src="https://img.shields.io/badge/CSS%20Modules-tokens%20only-1572B6?logo=css&logoColor=white" alt="CSS Modules" />
+  <img src="https://img.shields.io/badge/Lenis-scroll%20scrub-111111" alt="Lenis" />
+  <img src="https://img.shields.io/badge/a11y-reduced--motion%20%C2%B7%20no--JS-5E35B1" alt="접근성" />
+  <img src="https://img.shields.io/badge/deploy-Vercel-000000?logo=vercel&logoColor=white" alt="Vercel" />
+</p>
 
 <img src="docs/images/01-main.png" width="820" alt="GRAPEVINE 메인 화면 — 넝쿨 위에 타이틀과 포도알" />
 
