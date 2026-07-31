@@ -51,4 +51,13 @@
 - **`SOURCE_FRAME` 상수 추가** — 환산 기준(1536×771)을 코드에 남겨야 나중에 역산이 가능하다.
 - **골든 역산 테스트 추가** — 피그마 원본 px 를 테스트에 박아 두고 % → px 로 되돌려 대조한다. 누가 % 값을 손으로 "조정"하면 즉시 깨진다. 허용 오차는 0.05px(`toBeCloseTo(_, 1)`) — 3자리 반올림 오차 0.008px 보다 크고 의미 있는 이동보다는 작다.
 - ⚠️ **컨테이너 종횡비 1536:771 (≈1.992) 을 유지해야 한다** — x는 폭 대비, y는 높이 대비로 환산했으므로 종횡비가 달라지면 알과 배경 넝쿨이 어긋난다. STEP 7·12 구현 제약.
-- **환경변수 이름을 Supabase 대시보드 현재 라벨에 맞춤** — `SUPABASE_ANON_KEY`/`SUPABASE_SERVICE_ROLE_KEY` → `SUPABASE_PUBLISHABLE_KEY`/`SUPABASE_SECRET_KEY`. 대시보드가 주는 이름과 코드가 달라 매번 머릿속에서 번역해야 했다. 함수 이름(`createAnonClient`/`createServiceRoleClient`)은 Postgres **역할** 기준이라 그대로 뒀다 — RLS 를 따질 때 중요한 건 키가 아니라 역할이다.
+- **환경변수 이름을 Supabase 대시보드 현재 라벨에 맞춤 (STEP 2b)** — `SUPABASE_ANON_KEY`/`SUPABASE_SERVICE_ROLE_KEY` → `SUPABASE_PUBLISHABLE_KEY`/`SUPABASE_SECRET_KEY`. 대시보드가 주는 이름과 코드가 달라 매번 머릿속에서 번역해야 했다. 함수 이름(`createAnonClient`/`createServiceRoleClient`)은 Postgres **역할** 기준이라 그대로 뒀다 — RLS 를 따질 때 중요한 건 키가 아니라 역할이다.
+
+## STEP 2c — 마이그레이션 원격 적용 (Supabase `ptnnqflkhmjhaciafjmn`)
+
+- **Direct connection 을 쓰지 않는다. Pooler 를 쓴다.** `db.<ref>.supabase.co` 는 **AAAA(IPv6) 레코드만** 있고 A 레코드가 없어서, IPv4 전용 네트워크에서는 이름 해석부터 실패한다. 대신 `aws-1-ap-northeast-2.pooler.supabase.com:5432`(session mode) 로 붙는다. 리전과 프리픽스는 실측으로 확정했다 — `aws-0` 은 `tenant not found`, `aws-1` 은 성공.
+- **DB 비밀번호는 영숫자로만 만든다** — `@ / : ? # & %` 가 들어가면 `--db-url` 에 퍼센트 인코딩이 필요해지고, 인코딩 실수와 진짜 비밀번호 오류가 같은 `password authentication failed` 로 보여서 원인 분리가 어려워진다.
+- **PAT 없이 `--db-url` 로 적용** — `supabase db push --db-url` 은 PAT 이 필요 없고, 마이그레이션 이력은 원격 DB 의 `supabase_migrations.schema_migrations` 에 기록되므로 이력 관리도 그대로 된다. PAT 은 `link` 편의용일 뿐이다.
+- **`db push` 의 Docker 경고는 무시해도 된다** — 로컬 마이그레이션 카탈로그 캐시(`db diff` 용)를 만들지 못한다는 뜻이고 push 자체와 무관하다.
+- ⚠️ **RLS deny-all 에서 SELECT 는 403 이 아니라 `[]` + HTTP 200 을 반환한다.** 정책이 없으면 PostgREST 는 "거부"가 아니라 "0행"으로 응답한다. 실제 데이터를 커밋해 두고 확인한 결과 publishable key 로는 4개 테이블 전부 `[]`, secret key 로만 보인다. **데이터는 새지 않지만, `/v/[slug]` 공개 조회를 publishable key 로 처리할 수는 없다** — 모든 읽기도 서버에서 service_role 로 해야 한다. 확정된 설계 그대로다.
+- **원격 DB 에서 제약 14종 재검증 완료** — 전부 트랜잭션 안에서 실행하고 롤백해 잔여 행 0. 로컬 PG16 결과와 동일하다.
