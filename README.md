@@ -2,8 +2,6 @@
 
 # GRAPEVINE
 
-### 포도나무열렸네
-
 **Grapes are growing on the vine.**
 
 친구가 남긴 칭찬이 내 넝쿨에서 포도알로 자란다.
