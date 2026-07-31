@@ -1,3 +1,4 @@
+import { DecorGrapes, type DecorGrape } from '@/components/decor-grapes';
 import { Screen } from '@/components/screen';
 import { Sidebar } from '@/components/sidebar';
 import { copy } from '@/data';
@@ -33,11 +34,11 @@ function splitSentences(text: string): string[] {
   return text.split(/(?<=\.)\s+/);
 }
 
-/** 프레임(1536×771) 대비 중심 좌표 %. Figma 201:658 / 659 / 660. */
-const DECOR_GRAPES = [
-  { left: '68.066%', top: '69.585%' }, // 964, 455
-  { left: '52.376%', top: '48.443%' }, // 723, 292
-  { left: '32.585%', top: '83.852%' }, // 419, 565
+/** 프레임(1536×771) 대비 %. Figma 201:658 / 659 / 660. */
+const GRAPES: readonly DecorGrape[] = [
+  { x: 68.066, y: 69.585, size: 10.612 }, // 964, 455
+  { x: 52.376, y: 48.443, size: 10.612 }, // 723, 292
+  { x: 32.585, y: 83.852, size: 10.612 }, // 419, 565
 ];
 
 export default function MainPage() {
@@ -45,6 +46,7 @@ export default function MainPage() {
 
   return (
     <Screen background="/images/main_2.png" tone="light" priority>
+      <DecorGrapes grapes={GRAPES} />
       <Sidebar variant="guest" />
 
       <h1 className={styles.title}>
@@ -60,10 +62,6 @@ export default function MainPage() {
           </span>
         ))}
       </p>
-
-      {DECOR_GRAPES.map((grape) => (
-        <span key={grape.left} className={styles.grape} style={grape} aria-hidden="true" />
-      ))}
     </Screen>
   );
 }

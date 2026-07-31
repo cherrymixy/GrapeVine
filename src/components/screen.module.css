@@ -13,6 +13,11 @@
   isolation: isolate;
 }
 
+/* 사진 없이 단색으로 깔리는 화면 (About 201:667). */
+.screen[data-surface='flat'] {
+  background: var(--surface);
+}
+
 /* 배경 사진 — 뷰포트를 덮는다. Figma 는 프레임보다 큰 이미지를 넘치게 얹는다. */
 .background {
   object-fit: cover;

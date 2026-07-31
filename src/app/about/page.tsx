@@ -1,13 +1,36 @@
+import { BackLink } from '@/components/back-link';
+import { DecorGrapes, type DecorGrape } from '@/components/decor-grapes';
+import { Screen } from '@/components/screen';
 import { Sidebar } from '@/components/sidebar';
 import { copy } from '@/data';
 
-// 회색박스. PRD §5.2 의 배경 포도알 4개 산포는 디자인 패스.
+import styles from './page.module.css';
+
+/**
+ * About — Figma 201:667 번역.
+ *
+ * 헤드라인은 About 이라는 낱말이 아니라 **태그라인**이다(201:681).
+ * `copy.about.title` 은 STEP 7 에서 임시로 넣은 자리표시자라 쓰지 않는다.
+ */
+
+/** 프레임(1536×771) 대비 %. Figma 201:671 / 670 / 669 / 668. */
+const GRAPES: readonly DecorGrape[] = [
+  { x: 54.134, y: 38.976, size: 10.612 }, // 750, 219
+  { x: 68.392, y: 54.929, size: 10.612 }, // 969, 342
+  { x: 92.415, y: 65.434, size: 10.612 }, // 1338, 423
+  { x: 49.316, y: 81.388, size: 10.612 }, // 676, 546
+];
+
 export default function AboutPage() {
   return (
-    <main>
-      <Sidebar variant="guest" />
-      <h1>{copy.about.title}</h1>
-      <p>{copy.about.body}</p>
-    </main>
+    <Screen tone="light">
+      <DecorGrapes grapes={GRAPES} />
+      <Sidebar variant="guest" current="/about" />
+
+      <BackLink href="/" />
+
+      <h1 className={styles.title}>{copy.main.title}</h1>
+      <p className={styles.body}>{copy.about.body}</p>
+    </Screen>
   );
 }

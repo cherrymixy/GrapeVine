@@ -80,12 +80,3 @@
   display: block;
 }
 
-/* 사진 위에 흩어진 장식 포도알 — 판의 슬롯이 아니다(slot-layout 소관 아님). */
-.grape {
-  position: absolute;
-  width: 10.612%; /* 163 / 1536 */
-  aspect-ratio: 1 / 1;
-  border-radius: var(--radius-pill);
-  background: var(--grape-filled);
-  transform: translate(-50%, -50%);
-}

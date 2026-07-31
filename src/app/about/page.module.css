@@ -1,0 +1,29 @@
+/*
+ * About — Figma 201:667.
+ *
+ * 사진 없이 단색 면 위에 좌상단 정렬. 헤드라인은 Main 과 같은 태그라인이고
+ * 장식 포도알 4개가 그 뒤에 깔린다.
+ */
+
+.title {
+  /* 201:681 top 232 — 뒤로가기(35.5 + 61) 아래 135.5 */
+  margin: 8.46875rem 0 0;
+  font-size: var(--font-size-display);
+  font-weight: var(--font-weight);
+  line-height: var(--line-height-display);
+  letter-spacing: var(--letter-spacing);
+  white-space: nowrap;
+}
+
+.body {
+  /*
+   * Figma 는 네 줄로 끊어 놨지만(201:679) copy.ts 는 한 문장이고 data/ 는
+   * 이번 범위가 아니다. 원문 폭(583)을 주고 자연 줄바꿈에 맡긴다 —
+   * 끊기는 지점이 시안과 완전히 같지는 않다.
+   */
+  max-width: 36.4375rem; /* 201:679 width 583 */
+  /* 201:679 top 326 — 헤드라인(232 + 61) 아래 33 */
+  margin: 2.0625rem 0 0;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+}

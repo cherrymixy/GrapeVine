@@ -43,6 +43,12 @@
   --grape-filled: var(--brand);  /* = #bf00f3 — 201:755 등 Ellipse 5002~5017 */
   --panel: var(--text-sub);      /* = #eae9e3 — 201:810 Ellipse 5031 */
 
+  /*
+   * 사진 없이 단색으로 깔리는 화면의 바탕 (About 201:667).
+   * 값은 --text-sub 와 같지만 쓰임이 글자가 아니라 면이라 이름을 따로 둔다.
+   */
+  --surface: var(--text-sub);    /* = #eae9e3 — 201:667 */
+
   /* 모달 딤 */
   --overlay-dim: rgba(0, 0, 0, 0.73);   /* 201:809 Rectangle 26 */
 

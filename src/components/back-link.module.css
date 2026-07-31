@@ -1,0 +1,14 @@
+/*
+ * 좌상단 뒤로가기 (Figma 201:678 / 201:689 / 201:729 / 201:822 …).
+ *
+ * 페이지 패딩과 같은 자리에서 시작하므로 별도 오프셋 없이 흐름의 첫 요소다.
+ * 크기는 헤드라인과 같은 display 단계다.
+ */
+
+.back {
+  display: inline-block;
+  color: inherit;
+  font-size: var(--font-size-display);
+  line-height: var(--line-height-display);
+  text-decoration: none;
+}
