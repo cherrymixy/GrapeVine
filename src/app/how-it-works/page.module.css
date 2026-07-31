@@ -1,0 +1,64 @@
+/*
+ * How It Works — Figma 201:682.
+ *
+ * 원이 점점 작아지면서 단계가 이어지고, 각 단계는 서로 다른 각도로 기울어
+ * 있다. 원 위에 번호 뱃지와 문구가 얹히고 **원과 뱃지의 색이 서로 반대**다
+ * (원이 마젠타면 뱃지가 진보라, 원이 진보라면 뱃지가 마젠타).
+ *
+ * 원·뱃지·문구는 Figma 에서 각각 독립 노드라 따로 배치한다.
+ * 좌표·지름은 프레임(1536×771) 대비 %, 회전은 deg. 단계마다 달라서
+ * 인라인 커스텀 프로퍼티로 넘어온다.
+ */
+
+.circle,
+.badge,
+.label,
+.decoration {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+}
+
+.circle {
+  z-index: -1; /* 글자 뒤. DecorGrapes 와 같은 이유 */
+  width: var(--size);
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-pill);
+  background: var(--fill);
+  transform: translate(-50%, -50%);
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--badge-padding);
+  border-radius: var(--radius-pill);
+  background: var(--badge-fill);
+  color: var(--text-sub);
+  font-size: var(--badge-size);
+  line-height: 1;
+  transform: translate(-50%, -50%) rotate(var(--rotate));
+}
+
+.label {
+  /*
+   * Figma 는 문구를 손으로 끊어 놨지만(예: "Create " / "My Grapevine")
+   * data/steps.ts 는 한 줄짜리 문자열이고 이번 범위가 아니다.
+   * 원문 폭을 주고 자연 줄바꿈에 맡긴다.
+   */
+  width: var(--label-width);
+  color: var(--label-ink);
+  font-size: var(--label-size);
+  line-height: var(--line-height-title);
+  text-align: right;
+  transform: translate(-50%, -50%) rotate(var(--rotate));
+}
+
+.decoration {
+  color: var(--label-ink);
+  font-size: var(--font-size-decoration);
+  line-height: 1;
+  white-space: nowrap;
+  transform: translate(-50%, -50%) rotate(var(--rotate));
+}
