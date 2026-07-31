@@ -53,6 +53,46 @@ label:has(input[type='checkbox']) {
 }
 
 /*
+ * 스크롤 구간에 맞춰 드러나는 오버레이 (STEP 16 / PRD §5.1 · §9.1).
+ *
+ * PRD §9.1 이 "오버레이는 영상에 인코딩하지 않고 **DOM 레이어**를 진행률
+ * 구간에 매핑"하라고 한 것을 그대로 옮긴 것이다. 문구를 고치려고 영상을
+ * 다시 뽑는 일이 없어야 한다.
+ *
+ * 하네스가 씬에 얹은 `--scroll-progress` 와 요소에 붙은 구간으로 **CSS 가
+ * 직접 계산**한다. JS 도 리렌더도 없다 — 그래서 Main 은 서버 컴포넌트다.
+ *
+ * `--scroll-progress` 기본값이 1 인 건 의도다. 씬 밖에서 이 클래스를 쓰면
+ * 감춰지는 게 아니라 **보인다** — 실수의 결과가 "안 보임"이면 안 된다.
+ */
+.reveal {
+  opacity: clamp(
+    0,
+    calc(
+      (var(--scroll-progress, 1) - var(--cue-from, 0)) / (var(--cue-to, 1) - var(--cue-from, 0))
+    ),
+    1
+  );
+}
+
+/* reduce — 구간 없이 즉시 다 보인다 (PRD §9.4 "정적 폴백 + 즉시 표시"). */
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+  }
+}
+
+/*
+ * JS 가 없으면 진행률이 영영 0 이라 타이틀도 사이드바도 **영영 안 보인다.**
+ * 스크롤 연출을 못 볼 뿐이지 내용을 못 볼 이유는 없다.
+ */
+@media (scripting: none) {
+  .reveal {
+    opacity: 1;
+  }
+}
+
+/*
  * 눈에는 안 보이지만 스크린리더는 읽는 텍스트.
  *
  * Figma 의 My Vine 프레임(201:749 / 201:753)에는 제목 글자가 없다 —

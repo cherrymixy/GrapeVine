@@ -1,10 +1,11 @@
 import { DecorGrapes, type DecorGrape } from '@/components/decor-grapes';
 import { Screen } from '@/components/screen';
 import { ScrollProgress } from '@/components/scroll-progress';
+import { REVEAL_CLASS, revealStyle } from '@/components/reveal';
 import { ScrollScene } from '@/components/scroll-scene';
 import { ScrubVideo } from '@/components/scrub-video';
 import { Sidebar } from '@/components/sidebar';
-import { MAIN_SCENE, copy } from '@/data';
+import { MAIN_CUES, MAIN_SCENE, copy } from '@/data';
 
 import styles from './page.module.css';
 
@@ -54,15 +55,24 @@ export default function MainPage() {
         */}
         <ScrubVideo src="/video/main.mp4" poster="/images/main_0.png" />
 
-        <DecorGrapes grapes={GRAPES} />
-        <Sidebar variant="guest" />
+        {/* 후반부에 하나씩 (PRD §5.1). 구간은 GRAPES 순서와 짝지어진다. */}
+        <DecorGrapes grapes={GRAPES} reveal={MAIN_CUES.grapes} />
 
-        <h1 className={styles.title}>
+        {/*
+          Sidebar 는 About·Login 등 다섯 화면이 함께 쓴다. 연출 때문에
+          공용 컴포넌트에 prop 을 늘리는 대신 여기서 감싼다 — `.sidebar` 는
+          absolute 인데 이 div 는 정적이라 위치 기준(`.content`)이 그대로다.
+        */}
+        <div className={REVEAL_CLASS} style={revealStyle(MAIN_CUES.sidebar)}>
+          <Sidebar variant="guest" />
+        </div>
+
+        <h1 className={`${styles.title} ${REVEAL_CLASS}`} style={revealStyle(MAIN_CUES.title)}>
           {lead}
           <span className={`${styles.selected} ${styles.caretDots}`}>{highlighted}</span>
         </h1>
 
-        <p className={styles.subtitle}>
+        <p className={`${styles.subtitle} ${REVEAL_CLASS}`} style={revealStyle(MAIN_CUES.subtitle)}>
           {copy.main.subtitleLines.map((line) => (
             <span key={line} className={styles.subtitleLine}>
               {line}

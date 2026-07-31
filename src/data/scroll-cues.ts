@@ -30,3 +30,41 @@ export const MAIN_SCENE: ScrollScene = {
   length: 4,
   lerp: 0.1,
 };
+
+/** 진행률 구간. `from` 에서 보이기 시작해 `to` 에서 다 보인다. */
+export type ScrollCue = {
+  readonly from: number;
+  readonly to: number;
+};
+
+/**
+ * Main 오버레이 구간 (PRD §5.1).
+ *
+ * > 넝쿨이 뻗어나감 → **후반부 포도알 그래픽이 하나씩 등장** →
+ * > **마지막에** 타이틀 + 서브카피 + 사이드바 등장
+ *
+ * PRD 가 정한 건 이 **순서와 대략의 자리**("후반부", "마지막")뿐이다.
+ * 아래 숫자는 그걸 구간으로 옮긴 것이고, ⚠️ Figma 에 타이밍 시안이 없으니
+ * **눈으로 보고 정해야 하는 값**이다 — `MAIN_SCENE.length` 와 같은 성격이라
+ * 같은 파일에 뒀다 (절대규칙 6). 늦으면 앞으로 당기고 급하면 벌린다.
+ *
+ * 앞 절반(0~0.5)은 넝쿨만 자란다. 오버레이가 일찍 끼면 영상 자체를 못 본다.
+ *
+ * `grapes` 는 `app/page.tsx` 의 `GRAPES` 배열 순서와 1:1 로 짝지어진다
+ * (= Figma 레이어 순서). 겹치게 두면 "하나씩"이 아니라 뭉쳐 보인다.
+ */
+export const MAIN_CUES = {
+  grapes: [
+    { from: 0.5, to: 0.6 },
+    { from: 0.6, to: 0.7 },
+    { from: 0.7, to: 0.8 },
+  ],
+  title: { from: 0.82, to: 0.9 },
+  subtitle: { from: 0.86, to: 0.94 },
+  sidebar: { from: 0.9, to: 0.98 },
+} as const satisfies {
+  grapes: readonly ScrollCue[];
+  title: ScrollCue;
+  subtitle: ScrollCue;
+  sidebar: ScrollCue;
+};

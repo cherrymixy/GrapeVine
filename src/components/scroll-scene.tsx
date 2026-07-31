@@ -165,7 +165,13 @@ export function ScrollScene({
       <div
         ref={sceneRef}
         className={styles.scene}
-        style={{ '--scene-length': length } as CSSProperties}
+        /*
+         * `--scroll-progress` 를 서버에서 0 으로 박아 둔다 (STEP 16).
+         * 안 그러면 하이드레이션 전까지 이 변수가 없어서 `.reveal` 이
+         * 기본값 1 을 써 **오버레이가 다 보였다가 사라진다.** 시작은 0 이다.
+         * (JS 가 아예 없는 경우는 globals.css 의 `scripting: none` 이 받는다.)
+         */
+        style={{ '--scene-length': length, '--scroll-progress': 0 } as CSSProperties}
         data-testid="scroll-scene"
       >
         <div className={styles.pin}>{children}</div>

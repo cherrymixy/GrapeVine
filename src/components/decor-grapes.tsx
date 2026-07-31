@@ -1,4 +1,7 @@
+import type { ScrollCue } from '@/data';
+
 import styles from './decor-grapes.module.css';
+import { REVEAL_CLASS, revealStyle } from './reveal';
 
 /** 프레임(1536×771) 대비 중심 좌표와 지름. 전부 % 다. */
 export type DecorGrape = {
@@ -28,26 +31,37 @@ export type DecorTone = 'grape' | 'panel';
 export function DecorGrapes({
   grapes,
   tone = 'grape',
+  reveal,
 }: {
   grapes: readonly DecorGrape[];
   tone?: DecorTone;
+  /**
+   * 스크롤 구간에 맞춰 하나씩 드러낼 때만 넘긴다 (Main — PRD §5.1).
+   * `grapes` 와 **같은 순서**로 짝지어진다. 없으면 그냥 다 보인다 —
+   * About·Login·Sign Up 은 스크롤 씬이 아니다.
+   */
+  reveal?: readonly ScrollCue[];
 }) {
   return (
     <>
-      {grapes.map((grape) => (
-        <span
-          key={`${grape.x}-${grape.y}`}
-          className={styles.grape}
-          data-tone={tone}
-          style={{
-            left: `${grape.x}%`,
-            top: `${grape.y}%`,
-            width: `${grape.size}%`,
-            aspectRatio: '1 / 1',
-          }}
-          aria-hidden="true"
-        />
-      ))}
+      {grapes.map((grape, index) => {
+        const cue = reveal?.[index];
+        return (
+          <span
+            key={`${grape.x}-${grape.y}`}
+            className={cue ? `${styles.grape} ${REVEAL_CLASS}` : styles.grape}
+            data-tone={tone}
+            style={{
+              left: `${grape.x}%`,
+              top: `${grape.y}%`,
+              width: `${grape.size}%`,
+              aspectRatio: '1 / 1',
+              ...(cue ? revealStyle(cue) : null),
+            }}
+            aria-hidden="true"
+          />
+        );
+      })}
     </>
   );
 }
