@@ -45,6 +45,10 @@ export const copy = {
     logIn: 'Log in',
     signUpPrompt: "Don't have an account?",
     signUp: 'Sign Up',
+    // TODO(승아): PRD §5.4 는 로그인 폼만 정의하고 가입 폼 문구를 주지 않았다.
+    // 아래 둘은 회색박스용 잠정값 — 피그마 가입 화면이 나오면 교체할 것.
+    displayNameLabel: 'DISPLAY NAME',
+    logOut: 'Log out',
   },
 
   /** My Vine `/my` — PRD §5.5 */

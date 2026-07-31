@@ -15,7 +15,11 @@ export type DomainErrorCode =
   | 'SLUG_EXHAUSTED'
   | 'MESSAGE_TOO_LONG'
   | 'INVALID_AUTHOR_NAME'
-  | 'REPOSITORY_FAILURE';
+  | 'REPOSITORY_FAILURE'
+  | 'INVALID_SIGNUP_INPUT'
+  | 'LOGIN_ID_TAKEN'
+  | 'INVALID_CREDENTIALS'
+  | 'AUTH_FAILURE';
 
 export abstract class DomainError extends Error {
   abstract readonly code: DomainErrorCode;
@@ -140,5 +144,58 @@ export class RepositoryFailureError extends DomainError {
     options?: ErrorOptions,
   ) {
     super(`repository operation failed: ${operation}`, options);
+  }
+}
+
+// --- 계정 (STEP 4) -----------------------------------------------------------
+
+/** 가입 입력이 형식을 못 맞춤. 어느 필드인지 `field` 로 구분한다. */
+export class InvalidSignUpInputError extends DomainError {
+  readonly code = 'INVALID_SIGNUP_INPUT' as const;
+
+  constructor(
+    readonly field: 'loginId' | 'password' | 'displayName',
+    options?: ErrorOptions,
+  ) {
+    super(`invalid sign-up input: ${field}`, options);
+  }
+}
+
+/**
+ * 이미 쓰이는 loginId.
+ * loginId ↔ 합성 이메일이 1:1 이라 auth 쪽 이메일 중복이 곧 이 에러다.
+ */
+export class LoginIdTakenError extends DomainError {
+  readonly code = 'LOGIN_ID_TAKEN' as const;
+
+  constructor(
+    readonly loginId: string,
+    options?: ErrorOptions,
+  ) {
+    super(`login id already taken: ${loginId}`, options);
+  }
+}
+
+/**
+ * 아이디 또는 비밀번호 불일치.
+ * 어느 쪽이 틀렸는지 구분하지 않는다 — 구분하면 아이디 존재 여부가 새어나간다.
+ */
+export class InvalidCredentialsError extends DomainError {
+  readonly code = 'INVALID_CREDENTIALS' as const;
+
+  constructor(options?: ErrorOptions) {
+    super('invalid login id or password', options);
+  }
+}
+
+/** 도메인 규칙이 아닌 인증 백엔드 실패. */
+export class AuthFailureError extends DomainError {
+  readonly code = 'AUTH_FAILURE' as const;
+
+  constructor(
+    readonly operation: string,
+    options?: ErrorOptions,
+  ) {
+    super(`auth operation failed: ${operation}`, options);
   }
 }

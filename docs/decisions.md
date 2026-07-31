@@ -86,3 +86,20 @@
 - **적용된 마이그레이션은 수정하지 않고 새 파일로 고친다** — 파일을 고치면 이 DB(이미 적용됨)와 새로 만든 DB(수정본 적용)의 스키마가 갈라진다.
 - **`.rpc().returns<T>()` 는 스칼라 jsonb 반환에 쓸 수 없다** — supabase-js 가 배열 캐스팅으로 간주해 타입 에러를 낸다. 런타임은 정상이라 테스트만 돌리면 못 잡는다. 경계에서 `as` 캐스트 + 형태 확인으로 처리해, 형태가 어긋나면 매핑 중 TypeError 가 아니라 `RepositoryFailureError` 로 드러나게 했다.
 - **`withUniqueSlug` 재시도 경로 테스트 6개 추가** — 왕복 테스트에서는 슬러그가 충돌하지 않아 재시도 루프가 한 번도 실행되지 않았다. 순수 함수라 주입만으로 덮인다: 충돌 후 재시도 성공 / 예산 소진 시 `SlugExhaustedError` / 마지막 충돌을 `cause` 로 보존 / **충돌이 아닌 에러는 재시도 없이 즉시 재던짐** / 첫 시도 성공 시 1회만 호출.
+
+## STEP 4 — 계정 (auth + 라우트 가드)
+
+- **가입은 `signUp()` 이 아니라 `admin.createUser({ email_confirm: true })`** — 이 프로젝트는 `mailer_autoconfirm: false`(이메일 확인 켜짐)인데 합성 주소 `{loginId}@grapevine.local` 은 메일을 받을 수 없다. `signUp()` 을 쓰면 확인이 영원히 끝나지 않아 **가입이 완료되지 않는다.** Admin API 로 확인된 사용자를 바로 만들면 메일이 나가지 않고 대시보드 설정도 건드릴 필요가 없다. 부수 효과로 **loginId 유일성이 공짜로 얻어진다** — loginId ↔ 이메일이 1:1 이라 GoTrue 의 이메일 중복 거절이 곧 `LoginIdTakenError` 다.
+- **프로필은 트리거가 아니라 멱등 upsert(`ensureProfile`)** — `admin.createUser` 는 HTTP 호출이라 우리 SQL 과 한 트랜잭션에 묶는 것이 **원리적으로 불가능**하다. `auth.users` 트리거는 소유자가 `supabase_auth_admin` 이라 막힐 수 있고, 무엇보다 원자성을 흉내내봐야 반쪽이다. 대신 가입·로그인 **양쪽**에서 부르는 멱등 upsert 로 만들어 프로필 누락이 다음 로그인에 스스로 낫게 했다. 보상 삭제를 안 쓰는 이유는 STEP 3b 와 같다 — 보상 자체가 실패할 수 있다.
+- **`users_auth_fkey` 는 실제로 생성 가능했다** — 계획 단계에서 권한이 막힐 수 있다고 봤으나, 트랜잭션 안에서 시험해 보고 가능함을 확인한 뒤 적용했다. 추측으로 우회하지 않았다.
+- ⚠️ **FK 가 STEP 3 테스트 픽스처를 잡았다** — 임의 UUID 로 `public.users` 에 직접 넣던 방식이 이제 막힌다. 픽스처가 실재하는 auth 사용자를 만들도록 고쳤다. 뒷정리도 `admin.deleteUser` 한 번으로 `public.users → vines → vine_pages → grapes` 까지 cascade 된다. **FK 가 제 일을 한 것이므로 테스트를 고치는 게 맞다.**
+- **폼은 Server Action 이 아니라 Route Handler** — 요청받은 검증이 전부 "HTTP 요청 → 상태코드/리다이렉트"라 Server Action(액션 ID + `Next-Action` 헤더 필요)으로는 정직하게 테스트하기 어렵다. 평범한 폼 POST 라 **JS 없이 동작**하는 것도 회색박스 단계에 맞다.
+- **POST 후 리다이렉트는 303** — 302/307 은 메서드를 보존해서 브라우저가 `/my` 로 다시 POST 를 보낸다.
+- **세션 확인은 `getUser()`, `getSession()` 금지** — `getSession()` 은 쿠키를 그대로 믿어 위조가 가능하다. `getUser()` 는 인증 서버에 토큰을 검증시킨다. 가드에 쓰는 값이라 반드시 후자.
+- **Next 16 은 `middleware.ts` 가 deprecated, `proxy.ts` 로 개명** — 함수명도 `proxy`. `src/app` 구조라 파일은 `src/proxy.ts`. 빌드 출력에 `ƒ Proxy (Middleware)` 로 등록됨을 확인했다.
+- **가드는 두 겹** — Next 문서가 명시적으로 경고한다: *"Always verify authentication and authorization inside each Server Function rather than relying on Proxy alone."* matcher 변경이나 라우트 이동으로 커버리지가 조용히 사라질 수 있으므로 `/my` 페이지가 세션을 **다시** 확인한다.
+- **`proxy` matcher 는 `/my` 만** — `/v/[slug]` 가 목록에 **없다**는 사실이 절대규칙 4를 보장한다. "공개로 둔다"는 코드가 아니라 가드가 애초에 실행되지 않는 구조다.
+- **로그인 실패는 아이디/비밀번호를 구분하지 않는다** — 구분하면 어떤 아이디가 존재하는지가 새어나간다.
+- **loginId 는 `^[a-z0-9][a-z0-9._-]{2,29}$` 로 제한** — 이메일 local part 가 되므로 `@` 나 공백이 들어가면 주소 자체가 바뀌어 다른 계정에 붙을 수 있다.
+- ⚠️ **잠정값 3개, 확정 필요** — ① `displayName` 상한 **40자**(PRD 에 값 없음. 확정되면 DB CHECK 로도 내려야 한다) ② `copy.auth.displayNameLabel` ③ `copy.auth.logOut`. ②③ 은 PRD §5.4 가 로그인 폼만 정의하고 가입 폼 문구를 주지 않아 회색박스용으로 임시로 넣었다. 피그마 가입 화면이 나오면 교체.
+- **라우트 테스트는 실서버를 띄운다** — 가드는 단위 테스트로 못 잡는다. matcher 미적용, 쿠키 미전달 같은 실패가 전부 배선 문제라 진짜 HTTP 여야 의미가 있다. `next build && next start` 로 띄워 지연 컴파일 변수를 없앴다. 대가로 `npm test` 가 ~12초 늘었다.

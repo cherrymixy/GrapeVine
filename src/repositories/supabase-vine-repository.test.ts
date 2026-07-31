@@ -2,6 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { PAGE_CAPACITY } from '@/data/slot-layout';
+import { toSyntheticEmail } from '@/lib/auth';
 import { SlotTakenError } from '@/lib/errors';
 import { createServiceRoleClient } from '@/lib/supabase';
 import { SupabaseVineRepository } from '@/repositories/supabase-vine-repository';
@@ -14,31 +15,43 @@ describe.skipIf(!hasCredentials)('SupabaseVineRepository (원격 왕복)', () =>
   // 본문에서 만들면 자격증명 없는 환경에서 스킵이 아니라 수집 단계 실패가 된다.
   let client: SupabaseClient;
   let repository: SupabaseVineRepository;
-  const createdUserIds: string[] = [];
+  const createdAuthUserIds: string[] = [];
 
   beforeAll(() => {
     client = createServiceRoleClient();
     repository = new SupabaseVineRepository(client);
   });
 
-  // users 삭제가 vines → vine_pages → grapes 로 cascade 된다.
+  // auth 사용자 삭제가 public.users → vines → vine_pages → grapes 로 cascade 된다.
   afterAll(async () => {
-    for (const id of createdUserIds) {
-      await client.from('users').delete().eq('id', id);
+    for (const id of createdAuthUserIds) {
+      await client.auth.admin.deleteUser(id);
     }
   });
 
+  /**
+   * `users_auth_fkey`(STEP 4) 때문에 프로필 행은 실재하는 auth 사용자를
+   * 가리켜야 한다. 임의 UUID 를 넣던 예전 방식은 이제 FK 에 막힌다.
+   */
   async function createOwner(): Promise<string> {
-    const loginId = `__test_${crypto.randomUUID().slice(0, 12)}`;
-    const { data, error } = await client
-      .from('users')
-      .insert({ login_id: loginId, display_name: 'Test Owner' })
-      .select('id')
-      .single<{ id: string }>();
+    const loginId = `t${crypto.randomUUID().slice(0, 12).replace(/-/g, '')}`;
 
-    if (error) throw new Error(`test fixture failed: ${error.message}`);
-    createdUserIds.push(data.id);
-    return data.id;
+    const { data: created, error: authError } = await client.auth.admin.createUser({
+      email: toSyntheticEmail(loginId),
+      password: 'test-password-123',
+      email_confirm: true,
+    });
+    if (authError || !created.user) {
+      throw new Error(`test fixture failed (auth): ${authError?.message}`);
+    }
+    createdAuthUserIds.push(created.user.id);
+
+    const { error } = await client
+      .from('users')
+      .insert({ id: created.user.id, login_id: loginId, display_name: 'Test Owner' });
+    if (error) throw new Error(`test fixture failed (profile): ${error.message}`);
+
+    return created.user.id;
   }
 
   it('생성한 판을 슬러그로 다시 찾고, 슬롯을 점유하고, 중복 점유는 거부한다', async () => {
