@@ -1,0 +1,57 @@
+/*
+ * 스크롤 유도 (STEP 21).
+ *
+ * ⚠️ Figma 에 시안이 없다. 새 모양을 지어내는 대신 이 서비스가 이미 쓰는
+ *    것만 조합했다 — 선 두께는 pill·빈 알과 같은 `--border-width`, 색은
+ *    그 화면의 잉크(`--screen-ink`), 글자는 없다.
+ */
+
+/*
+ * 폭 전체를 차지하는 상자 안에서 flex 로 가운데 둔다.
+ *
+ * `left: 50%` + `translate: -50%` 로도 되지만, 그건 요소 **자기 폭**의 절반을
+ * 되미는 방식이라 보더·회전이 얽히면 눈으로 검산하기 어렵다. 이쪽은 상자가
+ * 폭 전체라 계산할 것이 없다.
+ */
+.cue {
+  position: absolute;
+  right: 0;
+  bottom: var(--scroll-cue-bottom);
+  left: 0;
+  display: flex;
+  justify-content: center;
+  color: var(--screen-ink);
+}
+
+/* 아래쪽 갈매기 — 정사각형의 두 변만 남기고 45도 돌린다. */
+.chevron {
+  display: block;
+  width: var(--scroll-cue-size);
+  height: var(--scroll-cue-size);
+  border-right: var(--border-width) solid currentColor;
+  border-bottom: var(--border-width) solid currentColor;
+  rotate: 45deg;
+  animation: bob 1.8s ease-in-out infinite;
+}
+
+/*
+ * 아주 조금만 오르내린다. 크게 움직이면 화면의 주인공(넝쿨)을 뺏는다.
+ * `translate` 만 건드려 매 프레임 레이아웃을 다시 잡지 않는다.
+ */
+@keyframes bob {
+  0%,
+  100% {
+    translate: 0 -15%;
+  }
+
+  50% {
+    translate: 0 15%;
+  }
+}
+
+/* reduce — 제자리에 가만히 있는다 (PRD §9.4). 신호는 남고 움직임만 없다. */
+@media (prefers-reduced-motion: reduce) {
+  .chevron {
+    animation: none;
+  }
+}

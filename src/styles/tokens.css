@@ -95,6 +95,19 @@
   --selection-caret: var(--blue);       /* 201:656 캐럿 선·점 */
   --selection-caret-width: 2px;         /* 201:656 획 두께 */
   --selection-caret-dot: 8px;           /* 201:656 inset -5.33px → 지름 ≈ 10.7 - 획 */
+  /*
+   * 막대가 하이라이트 위아래로 넘치는 길이. 원래 page.module.css 에 0.5rem 으로
+   * 박혀 있던 값을 그대로 옮겼다 (새로 정한 값이 아니다).
+   */
+  --selection-caret-overshoot: 0.5rem;
+
+  /*
+   * 첫 화면의 스크롤 유도 (STEP 21).
+   * ⚠️ Figma 에 시안이 없다. 크기는 본문 글자와 같은 단계, 위치는 진행률 바를
+   *    가리지 않는 선에서 잡았다.
+   */
+  --scroll-cue-size: 0.75rem;
+  --scroll-cue-bottom: 2.5rem;
   --link: var(--blue);                  /* 201:740 Sign Up (밑줄) */
 
   /*

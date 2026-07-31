@@ -1,5 +1,6 @@
 import { DecorGrapes, type DecorGrape } from '@/components/decor-grapes';
 import { Screen } from '@/components/screen';
+import { ScrollCue } from '@/components/scroll-cue';
 import { ScrollProgress } from '@/components/scroll-progress';
 import { REVEAL_CLASS, revealStyle } from '@/components/reveal';
 import { ScrollScene } from '@/components/scroll-scene';
@@ -69,7 +70,14 @@ export default function MainPage() {
 
         <h1 className={`${styles.title} ${REVEAL_CLASS}`} style={revealStyle(MAIN_CUES.title)}>
           {lead}
-          <span className={`${styles.selected} ${styles.caretDots}`}>{highlighted}</span>
+          <span className={styles.selected}>
+            {highlighted}
+            {/*
+              손잡이 점은 **별도 엘리먼트**다. `.selected` 에 클래스를 하나 더
+              얹으면 `::before`/`::after` 가 겹쳐 세로 막대가 사라진다.
+            */}
+            <span className={styles.handles} aria-hidden="true" />
+          </span>
         </h1>
 
         <p className={`${styles.subtitle} ${REVEAL_CLASS}`} style={revealStyle(MAIN_CUES.subtitle)}>
@@ -80,6 +88,7 @@ export default function MainPage() {
           ))}
         </p>
 
+        <ScrollCue cue={MAIN_CUES.scrollCue} />
         <ScrollProgress />
       </Screen>
     </ScrollScene>

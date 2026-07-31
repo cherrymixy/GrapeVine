@@ -26,27 +26,47 @@
   background: var(--selection);
 }
 
+/*
+ * 세로 막대 — 텍스트 선택 손잡이다. 왼쪽은 **위로**, 오른쪽은 **아래로**
+ * 넘친다 (201:656 / 201:657). 양쪽이 같은 방향이면 선택 영역이 아니라
+ * 그냥 테두리로 보인다.
+ */
 .selected::before,
 .selected::after {
   position: absolute;
-  top: -0.5rem;
-  bottom: -0.5rem;
   width: var(--selection-caret-width);
   background: var(--selection-caret);
   content: '';
 }
 
 .selected::before {
+  top: calc(var(--selection-caret-overshoot) * -1);
+  bottom: 0;
   left: calc(var(--selection-caret-width) * -1);
 }
 
 .selected::after {
+  top: 0;
   right: calc(var(--selection-caret-width) * -1);
+  bottom: calc(var(--selection-caret-overshoot) * -1);
 }
 
-/* 캐럿 양 끝의 점 — 위쪽 왼편, 아래쪽 오른편 (스샷 기준) */
-.caretDots::before,
-.caretDots::after {
+/*
+ * 손잡이 끝의 점.
+ *
+ * ⚠️ **별도 엘리먼트여야 한다.** 전에는 이 규칙들을 `.selected` 와 같은
+ *    span 에 클래스 두 개로 얹었는데, 그러면 `::before`/`::after` 가 서로
+ *    같은 가상요소라 뒤 규칙이 `height` 를 주는 순간 `bottom` 이 무시된다 —
+ *    **세로 막대가 통째로 사라지고 점 두 개가 나란히 위에 붙었다.**
+ *    CSS 는 유효했고 화면만 틀렸다.
+ */
+.handles {
+  position: absolute;
+  inset: 0;
+}
+
+.handles::before,
+.handles::after {
   position: absolute;
   width: var(--selection-caret-dot);
   height: var(--selection-caret-dot);
@@ -55,14 +75,16 @@
   content: '';
 }
 
-.caretDots::before {
-  top: calc(-0.5rem - var(--selection-caret-dot) / 2);
-  left: calc(var(--selection-caret-dot) / -2);
+/* 좌상단 — 왼쪽 막대의 위 끝에 얹힌다. */
+.handles::before {
+  top: calc(var(--selection-caret-overshoot) * -1 - var(--selection-caret-dot) / 2);
+  left: calc(var(--selection-caret-width) / -2 - var(--selection-caret-dot) / 2);
 }
 
-.caretDots::after {
-  right: calc(var(--selection-caret-dot) / -2);
-  bottom: calc(-0.5rem - var(--selection-caret-dot) / 2);
+/* 우하단 — 오른쪽 막대의 아래 끝. */
+.handles::after {
+  right: calc(var(--selection-caret-width) / -2 - var(--selection-caret-dot) / 2);
+  bottom: calc(var(--selection-caret-overshoot) * -1 - var(--selection-caret-dot) / 2);
 }
 
 .subtitle {

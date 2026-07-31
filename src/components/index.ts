@@ -2,6 +2,7 @@
 export { CreateVineReveal } from './create-vine-reveal';
 export { DropCleanup } from './drop-cleanup';
 export { REVEAL_CLASS, revealStyle } from './reveal';
+export { ScrollCue } from './scroll-cue';
 export { ScrollProgress } from './scroll-progress';
 export { ScrollScene, useScrollScene, type ScrollSceneApi } from './scroll-scene';
 export { ScrubBackdrop } from './scrub-backdrop';

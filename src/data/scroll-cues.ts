@@ -59,11 +59,18 @@ export const MAIN_CUES = {
     { from: 0.6, to: 0.7 },
     { from: 0.7, to: 0.8 },
   ],
+  /*
+   * 스크롤 유도 — **사라지는** 구간이다 (STEP 21).
+   * `.reveal` 은 `(p - from) / (to - from)` 이라 `from > to` 로 뒤집으면
+   * 그대로 페이드아웃이 된다. 조금만 굴리면 없어진다.
+   */
+  scrollCue: { from: 0.08, to: 0 },
   title: { from: 0.82, to: 0.9 },
   subtitle: { from: 0.86, to: 0.94 },
   sidebar: { from: 0.9, to: 0.98 },
 } as const satisfies {
   grapes: readonly ScrollCue[];
+  scrollCue: ScrollCue;
   title: ScrollCue;
   subtitle: ScrollCue;
   sidebar: ScrollCue;
