@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-import { BackLink } from '@/components/back-link';
 import { CtaButton } from '@/components/cta-button';
 import { DropCleanup } from '@/components/drop-cleanup';
 import { GrapeBoard } from '@/components/grape-board';
@@ -96,16 +95,20 @@ export default async function OthersVinePage({
         view={view}
         slotHref={(slotIndex) => `${base}&grape=${slotIndex}`}
         dropSlot={/^\d+$/.test(search.dropped ?? '') ? Number(search.dropped) : null}
+        showEmpty={false}
       />
       <DropCleanup />
 
       {/* PRD §5.0 — 방문자 GNB 는 `{이름}'s Vine` 단일 항목이다. */}
       <Sidebar variant="visitor" ownerName={owner.displayName} />
 
-      {/* 모달이 열리면 좌상단이 뒤로가기로 바뀐다 (Figma 201:904 / 201:979). */}
-      {modalOpen ? (
-        <BackLink href={base} />
-      ) : (
+      {/*
+        모달이 열리면 좌상단을 비운다 (STEP 25, 승아님 지시).
+        전에는 뒤로가기 `<` 를 뒀는데, 방문자는 링크로 바로 들어온 사람이라
+        돌아갈 데가 따로 없다. 딤이 곧 닫기 링크이고 `aria-label` 도 있어
+        키보드로도 닫힌다.
+      */}
+      {modalOpen ? null : (
         <Pagination
           pageIndex={view.pageIndex}
           totalPages={view.totalPages}

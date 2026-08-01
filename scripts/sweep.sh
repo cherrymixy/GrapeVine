@@ -94,7 +94,10 @@ has "  약관 문서가 열린다" "$TERMS" 'data-testid="document"'
 has "  문서 뒤로가기 → 설정" "$TERMS" 'modal=setting'
 # 주인 화면에는 빈 알을 그리지 않는다 (STEP 23).
 hasnt "  주인 판에 빈 알 없음" "$(curl -s "$B/my" -H "cookie: $COOKIE")" 'data-filled="false"'
-has "  방문자 판에는 빈 알 있음" "$(curl -s "$B/v/$SLUG")" 'data-filled="false"' 
+hasnt "  방문자 판에도 빈 알 없음" "$(curl -s "$B/v/$SLUG")" 'data-filled="false"'
+# 방문자 모달에는 좌상단 뒤로가기를 두지 않는다 (딤이 곧 닫기다).
+hasnt "  방문자 모달에 뒤로가기 없음" "$(curl -s "$B/v/$SLUG?modal=add")" 'data-testid="back"'
+has "  주인 모달에는 뒤로가기 있음" "$(curl -s "$B/my?modal=share" -H "cookie: $COOKIE")" 'data-testid="back"' 
 ACC=$(curl -s "$B/my?modal=account" -H "cookie: $COOKIE")
 has "My Account 모달 (죽은 링크 아님)" "$ACC" 'data-testid="account-modal"'
 has "  아이디 표시" "$ACC" "$L"
@@ -104,7 +107,10 @@ V=$(curl -s "$B/v/$SLUG")
 chk "GET /v/[slug] 200" "$(code $B/v/$SLUG)" "200"
 has "  주인 이름 pill" "$V" "Blair"
 has "  CTA add" "$V" 'data-kind="inverted"'
-chk "  빈 알 15칸" "$(echo "$V" | grep -o 'data-filled="false"' | wc -l | tr -d ' ')" "15"
+# 빈 알은 이제 그리지 않는다 (STEP 25). 새 판이 비어 있다는 건 "채운 알 0" 과
+# "붙일 수 있음(CTA add)" 으로 확인한다. 15칸이라는 사실 자체는 도메인
+# 테스트(attach-grape.test.ts)가 보증한다.
+chk "  새 판은 채운 알 0" "$(echo "$V" | grep -o 'data-filled="true"' | wc -l | tr -d ' ')" "0"
 
 echo "── 9. 칭찬 붙이기"
 chk "기명 전송" "$(loc -X POST $B/api/v/$SLUG/grape -d "page=1&authorName=Clara&message=You are kind." | grep -c 'error=')" "0"
@@ -143,7 +149,7 @@ chk "  totalPages 2" "$(echo "$V3" | grep -oE 'data-total="[0-9]+"' | head -1)" 
 has "  다음 페이지 링크" "$V3" 'data-testid="next-page"'
 chk "  꽉 찬 페이지 전송 거절" "$(loc -X POST $B/api/v/$SLUG/grape -d "page=1&authorName=L&message=late" | grep -o 'error=[A-Z_]*')" "error=PAGE_FULL"
 V4=$(curl -s "$B/v/$SLUG?page=2")
-chk "  2페이지 빈 15칸" "$(echo "$V4" | grep -o 'data-filled="false"' | wc -l | tr -d ' ')" "15"
+chk "  2페이지는 채운 알 0" "$(echo "$V4" | grep -o 'data-filled="true"' | wc -l | tr -d ' ')" "0"
 has "  2페이지 CTA add" "$V4" 'data-kind="inverted"'
 
 echo "── 12. 페이지 클램프"
