@@ -45,7 +45,7 @@
 
 <table>
 <tr>
-<td width="33%"><img src="docs/images/05-visitor-board.png" alt="방문자가 보는 판" /><br/><sub><b>1. 링크를 연다</b><br/>빈 알은 아웃라인이고 채운 알은 솔리드다</sub></td>
+<td width="33%"><img src="docs/images/05-visitor-board.png" alt="방문자가 보는 판" /><br/><sub><b>1. 링크를 연다</b><br/>친구들이 남긴 알만 넝쿨 위에 놓인다</sub></td>
 <td width="33%"><img src="docs/images/06-add-grape.png" alt="Add Grape 모달" /><br/><sub><b>2. 칭찬을 붙인다</b><br/>이름을 쓰거나 <code>Unknown</code> 을 고른다</sub></td>
 <td width="33%"><img src="docs/images/07-see-grape.png" alt="See Grape 모달" /><br/><sub><b>3. 눌러서 읽는다</b><br/>이름이 제목이 되고 아래에 칭찬이 온다</sub></td>
 </tr>
@@ -139,7 +139,7 @@ PRD 는 이미지 시퀀스를 iOS 스크러빙이 불안정할 때의 폴백으
 </tr>
 <tr>
 <td><img src="docs/images/04-about.png" alt="About" /><br/><sub><b>About</b><br/>포도알이 떠다니고 커서를 피한다</sub></td>
-<td><img src="docs/images/08-my-board.png" alt="My Vine" /><br/><sub><b>My Vine</b><br/>주인 화면에는 빈 알을 그리지 않는다</sub></td>
+<td><img src="docs/images/08-my-board.png" alt="My Vine" /><br/><sub><b>My Vine</b><br/>빈 자리는 그리지 않는다. 채운 수만 보인다</sub></td>
 </tr>
 <tr>
 <td><img src="docs/images/09-share.png" alt="Share My Vine" /><br/><sub><b>Share</b><br/>이 링크가 전부다</sub></td>
